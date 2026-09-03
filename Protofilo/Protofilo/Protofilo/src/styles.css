@@ -1,0 +1,72 @@
+:root {
+  --void: #05060a;
+  --void-2: #0a0c13;
+  --void-3: #0e1119;
+  --surface: rgba(255, 255, 255, 0.03);
+  --surface-2: rgba(255, 255, 255, 0.055);
+  --line: rgba(255, 255, 255, 0.09);
+  --line-strong: rgba(200, 220, 255, 0.18);
+  --ink: #f4f6fb;
+  --ink-soft: #b9c0d0;
+  --ink-dim: #6b7284;
+  --ink-faint: #454b59;
+
+  /* single restrained luminous accent + cool ember for warmth */
+  --accent: #7cc4ff;
+  --accent-bright: #a8d8ff;
+  --accent-deep: #3f7fd9;
+  --ember: #d9a779;
+  --ice: #d8eaff;
+  --verdant: #6fd6b0;
+
+  --font-display: 'Sora', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-snap: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-lux: cubic-bezier(0.83, 0, 0.17, 1);
+  --shadow-deep: 0 40px 120px rgba(0, 0, 0, 0.7);
+  --glow-soft: 0 0 60px rgba(124, 196, 255, 0.16);
+  --glow-accent: 0 0 50px rgba(124, 196, 255, 0.35);
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: var(--ink-dim) var(--void);
+}
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--void); }
+::-webkit-scrollbar-thumb { background: linear-gradient(180deg, var(--accent-deep), var(--ink-dim)); border-radius: 2px; }
+
+body {
+  font-family: var(--font-body);
+  color: var(--ink);
+  background: var(--void);
+  overflow-x: hidden;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  cursor: none;
+}
+
+::selection { background: var(--accent); color: #05060a; }
+a { text-decoration: none; color: inherit; }
+button { cursor: none; font-family: inherit; border: none; background: none; color: inherit; }
+img { max-width: 100%; display: block; }
+ul { list-style: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  html { scroll-behavior: auto; }
+}
+
+html:not(.has-cursor) body { cursor: auto; }
+html:not(.has-cursor) button { cursor: pointer; }

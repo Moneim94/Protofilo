@@ -1,0 +1,303 @@
+<!-- ============ CINEMATIC LOADER ============ -->
+<div class="loader" [class.done]="loaded">
+  <div class="loader-core"><span></span></div>
+  <div class="loader-meta mono">SYSTEMS // INITIALIZING</div>
+</div>
+
+<!-- ============ CUSTOM CURSOR ============ -->
+<div class="cursor-dot" [class.on]="cursorVisible" #cursorDot></div>
+<div class="cursor" [class.on]="cursorVisible" [class.hover]="cursorHover" #cursor></div>
+
+<!-- ============ AMBIENT ENVIRONMENT ============ -->
+<div class="environment" aria-hidden="true">
+  <div class="light l1"></div>
+  <div class="light l2"></div>
+  <div class="grid-plane"></div>
+  <div class="horizon"></div>
+  <div class="particle-field">
+    @for (p of particles; track p) {
+      <i class="particle" [style.--i]="p"></i>
+    }
+  </div>
+</div>
+
+<div class="scroll-progress" [style.width.%]="progress"></div>
+
+<!-- ============ NAVIGATION ============ -->
+<header class="nav" [class.scrolled]="loaded && currentSection !== 'hero'">
+  <div class="nav-inner">
+    <a class="nav-mark" (click)="scrollTo('hero')" (mouseenter)="onCursorEnter()" (mouseleave)="onCursorLeave()">
+      <span class="mark-sigil"></span>
+      <span class="mark-text"><em>AE</em> SYSTEMS</span>
+    </a>
+    <div class="nav-links">
+      @for (item of nav; track item.id) {
+        <a class="nav-link" [class.active]="currentSection === item.id" (click)="scrollTo(item.id)" (mouseenter)="onCursorEnter()" (mouseleave)="onCursorLeave()">
+          <span class="nl-index mono">0{{ $index + 1 }}</span>{{ item.label }}
+        </a>
+      }
+      <a class="nav-cta" (click)="scrollTo('contact')" (mouseenter)="onCursorEnter()" (mouseleave)="onCursorLeave()">Resume</a>
+    </div>
+    <button class="menu-btn" [class.open]="menuOpen" (click)="menuOpen = !menuOpen" aria-label="Menu">
+      <span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<!-- mobile drawer -->
+<div class="drawer" [class.open]="menuOpen">
+  @for (item of nav; track item.id; let i = $index) {
+    <a class="drawer-link mono" (click)="scrollTo(item.id)">
+      <span class="dl-num">0{{ i }}</span>{{ item.label }}
+    </a>
+  }
+  <a class="drawer-cta" (click)="scrollTo('contact')">Download Résumé</a>
+</div>
+
+<!-- ============ HERO ============ -->
+<section id="hero" class="hero" (mousemove)="onMove($event)">
+  <div class="hero-hud mono" [class.on]="loaded">
+    <span>{{ coords }}</span>
+    <span class="hud-status"><i></i>{{ status }}</span>
+  </div>
+
+  <div class="hero-art" [class.on]="loaded">
+    <div class="arch arch-a"></div>
+    <div class="arch arch-b"></div>
+    <div class="arch arch-c"></div>
+    <div class="datum dm-1"></div>
+    <div class="datum dm-2"></div>
+    <div class="datum dm-3"></div>
+    <div class="data-stream ds-1">
+      @for (r of streamRows; track r) { <span></span> }
+    </div>
+    <div class="portrait-unit" [style.--mx]="mouseLX" [style.--my]="mouseLY">
+      <div class="portrait-tilt">
+        <div class="portrait-frame">
+          <img src="logo.png" alt="Ahmed Abd ElMoniem">
+          <div class="pf-scan"></div>
+        </div>
+        <div class="portrait-ring"></div>
+      </div>
+      <div class="portrait-label mono">
+        <span class="pl-id">ID // A.E.</span>
+        <span class="pl-status">● CERTIFIED</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-content" [class.hero-on]="loaded && currentSection === 'hero'">
+    <div class="hero-eyebrow mono" [style.--d]="0">
+      <span class="line"></span><span>PRINCIPAL SOFTWARE ENGINEER</span>
+    </div>
+    <h1 class="hero-name">
+      <span class="hn-block reveal-word" style="--d:0">Ahmed</span>
+      <span class="hn-block reveal-word hn-outline" style="--d:1">Abd&nbsp;ElMoniem</span>
+    </h1>
+    <p class="hero-role mono" [style.--d]="2">
+      <span class="role-prompt">→</span> <span class="role-type">{{ typed }}</span><span class="caret"></span>
+    </p>
+    <p class="hero-desc" [style.--d]="3">
+      I design and engineer the intelligent systems of tomorrow — architecture, 
+      identity, and experience woven into software that performs with quiet precision.
+    </p>
+    <div class="hero-actions" [style.--d]="4">
+      <a class="btn btn-prime" (click)="scrollTo('work')" (mousemove)="magnetic($event)" (mouseleave)="magneticReset($event)" (mouseenter)="onCursorEnter()" (mouseleave)="onCursorLeave()">
+        <span class="btn-label">Enter the Systems</span><span class="btn-arrow">→</span>
+      </a>
+      <a class="btn btn-ghost" href="Ahmed_Abd_ElMoniem_Resume.pdf" download="Ahmed_Abd_ElMoniem_Resume.pdf" (mousemove)="magnetic($event, 8)" (mouseleave)="magneticReset($event)" (mouseenter)="onCursorEnter()" (mouseleave)="onCursorLeave()">
+        <span class="btn-label">Résumé</span><span class="btn-icon">↓</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="hero-scroll mono" (click)="scrollTo('vision')">
+    <span>SCROLL</span><i></i>
+  </div>
+</section>
+
+<!-- ============ VISION / MANIFESTO ============ -->
+<section id="vision" class="vision">
+  <span class="section-code mono" data-reveal>// 01 — VISION</span>
+  <h2 class="manifesto" data-reveal>
+    <span class="m-line">I architect the systems</span>
+    <span class="m-line">behind the software</span>
+    <span class="m-line m-accent">that runs the future.</span>
+  </h2>
+  <div class="vision-meta" data-reveal>
+    <div class="vision-col">
+      <span class="vm-label mono">LAT 24.7136°</span>
+      <p class="vm-text">Every system is a composition of decisions — of boundaries, trade-offs, and intent. I bring order to complexity, clarity to ambiguity, and elegance to engineering.</p>
+    </div>
+    <div class="vision-stats">
+      @for (s of visionStats; track s.k) {
+        <div class="vstat">
+          <span class="vstat-num count-block">{{ counts[s.k] }}<i class="mono">{{ s.s }}</i></span>
+          <span class="vstat-label mono">{{ s.l }}</span>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- ============ SYSTEMS / CAPABILITIES ============ -->
+<section id="systems" class="systems">
+  <span class="section-code mono" data-reveal>// 02 — SYSTEMS</span>
+  <div class="window-head" data-reveal>
+    <h2 class="win-title">System <span class="win-title-dim">overview</span></h2>
+    <div class="win-status mono">
+      <i></i> 9 NODES ONLINE · <span class="live">LIVE</span>
+    </div>
+  </div>
+
+  <div class="console" data-reveal>
+    <div class="console-bar mono">
+      <span class="cb-dot r"></span><span class="cb-dot y"></span><span class="cb-dot g"></span>
+      <span class="cb-path">~ /principal/engineer</span><span class="cb-caret"></span>
+    </div>
+    <div class="console-body">
+      <div class="node-map">
+        <div class="nm-line"></div>
+        @for (n of nodes; track n.icon) {
+          <div class="node-card" [style.--i]="$index">
+            <span class="node-tag mono">{{ n.tag }}</span>
+            <h3 class="node-title">{{ n.title }}</h3>
+            <p class="node-desc">{{ n.desc }}</p>
+          </div>
+        }
+      </div>
+      <div class="stack-blob">
+        <span class="sb-label mono">STACK</span>
+        <div class="stack-train">
+          @for (s of stacks; track s.label; let i = $index) {
+            <div class="stack-chip mono" [style.--i]="i">
+              <span class="sc-role">{{ s.role }}</span>{{ s.label }}
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ WORK / PROJECTS ============ -->
+<section id="work" class="work">
+  <span class="section-code mono" data-reveal>// 03 — WORK</span>
+  <h2 class="section-lead" data-reveal>Featured <span class="dn">Systems</span></h2>
+
+  <div class="project-stack">
+    @for (p of projects; track p.title; let i = $index) {
+      <article class="fx-project" [class]="'fx-' + p.accent" [style.--i]="i" [style.--mx]="mouseLX * 100 + '%'" [style.--my]="mouseLY * 100 + '%'" data-reveal>
+        <div class="fx-visual">
+          <div class="fx-grid"></div>
+          <div class="fx-orbit">
+            <div class="fx-orbit-ring or-1"></div>
+            <div class="fx-orbit-ring or-2"></div>
+            <div class="fx-orbit-core"><span class="mono">{{ p.index }}</span></div>
+          </div>
+          <div class="fx-meta mono">
+            <span>{{ p.system }}</span>
+            <span>{{ p.year }}</span>
+          </div>
+        </div>
+        <div class="fx-content">
+          <div class="fx-index mono">0{{ i + 1 }}</div>
+          <h3 class="fx-title">{{ p.title }}</h3>
+          <p class="fx-subtitle mono">{{ p.subtitle }}</p>
+          <p class="fx-desc">{{ p.desc }}</p>
+          <div class="fx-tech">
+            @for (t of p.tech; track t) {
+              <span class="fx-tech-chip mono">{{ t }}</span>
+            }
+          </div>
+        </div>
+      </article>
+    }
+  </div>
+</section>
+
+<!-- ============ ARCHITECTURE / THINKING ============ -->
+<section id="architecture" class="architecture">
+  <span class="section-code mono" data-reveal>// 04 — ARCHITECTURE</span>
+  <h2 class="section-lead" data-reveal>Thinking in <span class="dn">layers</span></h2>
+
+  <div class="layers" data-reveal>
+    @for (p of principles; track p.code) {
+      <div class="layer-row">
+        <span class="layer-num mono">{{ p.code }}</span>
+        <h3 class="layer-word">{{ p.word }}</h3>
+        <span class="layer-rule"></span>
+        <p class="layer-desc">{{ p.desc }}</p>
+      </div>
+    }
+  </div>
+
+  <div class="blueprint" data-reveal>
+    <div class="bp-origin mono">ENGINEERING PHILOSOPHY</div>
+    <p class="bp-quote">
+      “Good architecture is invisible. It is the silence between systems,
+      the calm inside the storm — felt only in how gracefully everything works.”
+    </p>
+    <div class="bp-sign mono">— A. ABD ELMONIEM</div>
+  </div>
+</section>
+
+<!-- ============ JOURNEY ============ -->
+<section id="journey" class="journey">
+  <span class="section-code mono" data-reveal>// 05 — JOURNEY</span>
+  <h2 class="section-lead" data-reveal>The <span class="dn">timeline</span></h2>
+
+  <div class="strata" data-reveal>
+    @for (j of journey; track j.period; let i = $index) {
+      <div class="stratum" [class.current]="j.theme">
+        <span class="st-period mono">{{ j.period }}</span>
+        <div class="st-seam">
+          <span class="st-node"></span><i class="st-line"></i>
+        </div>
+        <div class="st-body">
+          <h3 class="st-role">{{ j.role }}</h3>
+          <span class="st-place mono">{{ j.place }} · {{ j.focus }}</span>
+          <span class="st-org mono" [class]="j.theme ? 'st-org-current' : ''">{{ j.org }}</span>
+        </div>
+      </div>
+    }
+  </div>
+
+  <div class="edu-row" data-reveal>
+    @for (ed of education; track ed.title) {
+      <div class="edu-item">
+        <span class="edu-year mono">{{ ed.year }}</span>
+        <h4 class="edu-title">{{ ed.title }}</h4>
+        <span class="edu-org mono">{{ ed.org }}</span>
+      </div>
+    }
+  </div>
+</section>
+
+<!-- ============ CONTACT ============ -->
+<section id="contact" class="contact">
+  <span class="section-code mono" data-reveal>// 06 — CONTACT</span>
+  <h2 class="contact-title" data-reveal>Let's build <span class="dn">something future</span></h2>
+  <p class="contact-sub" data-reveal>Have a system that deserves to be engineered with intention? Start the conversation.</p>
+
+  <div class="contact-actions" data-reveal>
+    <a class="c-card c-mail" href="mailto:{{ contact }}" (mousemove)="magnetic($event, 10)" (mouseleave)="magneticReset($event)">
+      <span class="cc-label mono">EMAIL</span>
+      <span class="cc-value">{{ contact }}</span>
+      <span class="cc-arrow">→</span>
+    </a>
+    <div class="c-card c-phone">
+      <span class="cc-label mono">PHONE</span>
+      <a class="cc-value" href="tel:+966503100847">{{ phoneSA }}</a>
+    </div>
+    <div class="c-card c-loc">
+      <span class="cc-label mono">BASE</span>
+      <span class="cc-value">{{ location }} · {{ coords }}</span>
+    </div>
+  </div>
+
+  <div class="contact-foot mono" data-reveal>
+    <span>Ahmed Abd ElMoniem — Principal Software Engineer</span>
+    <span>© 2026 · Systems of the future</span>
+  </div>
+</section>
