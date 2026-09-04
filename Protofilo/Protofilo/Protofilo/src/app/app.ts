@@ -276,7 +276,7 @@ export class App implements AfterViewInit, OnDestroy {
   ngAfterViewInit() {
     this.initScroll();
     this.initObserver();
-    setTimeout(() => { this.booted = true; }, 1150);
+    setTimeout(() => { this.booted = true; }, 1100);
   }
 
   ngOnDestroy() {
