@@ -3,45 +3,9 @@ import { CommonModule } from '@angular/common';
 
 /* ==================== INTERFACES ==================== */
 
-interface IntroParticle {
-  sx: number; sy: number; x: number; y: number;
-  tx: number; ty: number;
-  size: number; alpha: number; maxAlpha: number;
-  color: number; delay: number; born: number; converged: boolean;
-}
-
-interface IntroOrbit {
-  angle: number; radius: number; speed: number;
-  size: number; alpha: number; color: number; inclination: number;
-}
-
-interface IntroRing {
-  radius: number; speed: number; rotation: number;
-  lineWidth: number; alpha: number;
-}
-
-interface IntroGeo {
-  vertices: { x: number; y: number; z: number }[];
-  edges: [number, number][];
-  rx: number; ry: number; rz: number;
-  spinX: number; spinY: number; spinZ: number;
-  distance: number; scale: number;
-}
-
-interface AmbientDot {
-  x: number; y: number; vx: number; vy: number;
-  r: number; a: number; hue: number; pulse: number;
-}
-
-interface CoreParticle {
-  angle: number; radius: number; speed: number;
-  size: number; ring: number; hue: number;
-}
-
-interface MetricParticle {
-  x: number; y: number; vx: number; vy: number;
-  r: number; a: number; pulse: number;
-}
+interface AmbientDot { x: number; y: number; vx: number; vy: number; r: number; a: number; hue: number; pulse: number; }
+interface MetricParticle { x: number; y: number; vx: number; vy: number; r: number; a: number; pulse: number; }
+interface IntroGeo { verts: { x: number; y: number; z: number }[]; edges: [number, number][]; rx: number; ry: number; rz: number; sx: number; sy: number; sz: number; dist: number; scale: number; }
 
 /* ==================== COMPONENT ==================== */
 
@@ -127,8 +91,6 @@ export class App implements OnInit, OnDestroy, AfterViewInit {
   ];
 
   /* ==================== CANVAS ==================== */
-  private introCanvas!: HTMLCanvasElement;
-  private ictx!: CanvasRenderingContext2D;
   private ambientCanvas!: HTMLCanvasElement;
   private actx!: CanvasRenderingContext2D;
   private heroCanvas!: HTMLCanvasElement;
@@ -136,26 +98,39 @@ export class App implements OnInit, OnDestroy, AfterViewInit {
   private engCanvas!: HTMLCanvasElement;
   private ectx!: CanvasRenderingContext2D;
   private ambientDots: AmbientDot[] = [];
-  private coreParticles: CoreParticle[] = [];
   private rafId = 0;
   private scrollHandler: any;
   private observer!: IntersectionObserver;
 
-  /* ==================== INTRO ==================== */
+  /* ==================== INTRO SYSTEM ==================== */
+  private introCanvas!: HTMLCanvasElement;
+  private ictx!: CanvasRenderingContext2D;
   private introStartTime = 0;
-  private letterTargets: { x: number; y: number }[] = [];
-  private introParticles: IntroParticle[] = [];
-  private introOrbits: IntroOrbit[] = [];
-  private introRings: IntroRing[] = [];
-  private introGeos: IntroGeo[] = [];
+  private introTransitioning = false;
+  private introFullyDone = false;
   private isMobile = false;
   private fontsReady = false;
   private imageReady = false;
-  private introTransitioning = false;
-  private readonly INTRO_MIN = 2.6;
-  private readonly INTRO_MAX = 5.0;
+  private minimumTimeReached = false;
 
-  /* ==================== HERO CANVAS ==================== */
+  private introTextSample = '';
+  private letterTargets: { x: number; y: number }[] = [];
+
+  private pMain: { sx: number; sy: number; x: number; y: number; tx: number; ty: number; r: number; a: number; ma: number; col: number; delay: number }[] = [];
+  private pTrail: { x: number; y: number; a: number }[] = [];
+  private pFg: { x: number; y: number; vx: number; vy: number; r: number; a: number; pulse: number; col: number }[] = [];
+  private pOrbit: { angle: number; radius: number; speed: number; r: number; a: number; incl: number }[] = [];
+  private rings: { radius: number; speed: number; rot: number; lw: number }[] = [];
+  private geos: IntroGeo[] = [];
+
+  private collapseStart = 0;
+  private collapseFlash = 0;
+  private collapseDone = false;
+  private readonly INTRO_MIN = 3.0;
+  private readonly INTRO_MAX = 6.5;
+  private readonly COLLAPSE_DUR = 1.6;
+
+  /* ==================== HERO ==================== */
   private heroParticles: { x: number; y: number; vx: number; vy: number; r: number; a: number; pulse: number }[] = [];
 
   /* ==================== METRICS ==================== */
@@ -221,7 +196,12 @@ export class App implements OnInit, OnDestroy, AfterViewInit {
   onMouseLeave() { this.cursorX = -200; this.cursorY = -200; }
 
   /* ====================================================================
-     INTRO — MONEIM IDENTITY REVEAL
+     ██╗  ██████╗  ██████╗ ██████╗
+     ██║ ██╔═══██╗██╔═══██╗██╔══██╗
+     ██║ ██║   ██║██║   ██║██████╔╝
+     ██║ ██║   ██║██║   ██║██╔═══╝
+     ███████╗╚██████╔╝╚██████╔╝██║
+     ╚══════╝ ╚═════╝  ╚═════╝ ╚═╝
      ==================================================================== */
 
   private initIntro() {
@@ -230,10 +210,12 @@ export class App implements OnInit, OnDestroy, AfterViewInit {
     this.introStartTime = performance.now();
     this.resizeIntro();
     this.sampleLetterTargets();
-    this.spawnIntroParticles();
+    this.spawnIntroMain();
+    this.spawnIntroForeground();
     this.spawnIntroOrbits();
     this.spawnIntroRings();
     this.spawnIntroGeos();
+
     document.fonts.ready.then(() => { this.fontsReady = true; this.checkIntroReady(); });
     const img = new Image();
     img.onload = () => { this.imageReady = true; this.checkIntroReady(); };
@@ -242,57 +224,54 @@ export class App implements OnInit, OnDestroy, AfterViewInit {
   }
 
   private checkIntroReady() {
-    if (this.fontsReady && this.imageReady && !this.minimumTimeReached && !this.introTransitioning) {
-      /* resources ready, wait for minimum time */
-    }
-    if (this.fontsReady && this.imageReady && this.minimumTimeReached && !this.introTransitioning) {
+    if (this.fontsReady && this.imageReady && this.minimumTimeReached && !this.introTransitioning && !this.introFullyDone) {
       this.finishIntro();
     }
   }
-  private minimumTimeReached = false;
 
   private resizeIntro() {
-    this.introCanvas.width = window.innerWidth;
-    this.introCanvas.height = window.innerHeight;
-    this.isMobile = window.innerWidth < 768;
-    if (this.introParticles.length > 0) { this.sampleLetterTargets(); this.reassignTargets(); }
+    if (!this.introCanvas) return;
+    const w = window.innerWidth; const h = window.innerHeight;
+    this.introCanvas.width = w; this.introCanvas.height = h;
+    this.isMobile = w < 768;
+    if (this.pMain.length > 0) { this.sampleLetterTargets(); this.reassignTargets(); }
   }
 
   private sampleLetterTargets() {
-    const c = document.createElement('canvas');
-    const ctx = c.getContext('2d')!;
     const w = this.introCanvas.width; const h = this.introCanvas.height;
+    const c = document.createElement('canvas');
     c.width = w; c.height = h;
-    const fs = Math.min(w * 0.13, 130);
+    const ctx = c.getContext('2d')!;
+    const fs = Math.min(w * 0.14, 140);
     ctx.fillStyle = '#fff';
-    ctx.font = `700 ${fs}px 'Space Grotesk', sans-serif`;
+    ctx.font = `600 ${fs}px 'Outfit', 'Space Grotesk', sans-serif`;
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.letterSpacing = '0.12em';
     ctx.fillText('MONEIM', w / 2, h / 2);
     const data = ctx.getImageData(0, 0, w, h).data;
     this.letterTargets = [];
-    const step = Math.max(3, Math.floor(fs / 28));
+    const step = Math.max(2, Math.floor(fs / 30));
     for (let y = 0; y < h; y += step) for (let x = 0; x < w; x += step) {
       if (data[(y * w + x) * 4 + 3] > 128) this.letterTargets.push({ x, y });
     }
+    this.introTextSample = `${w}x${h}@${Math.round(fs)}`;
   }
 
-  private spawnIntroParticles() {
+  private spawnIntroMain() {
     const w = this.introCanvas.width; const h = this.introCanvas.height;
     const cx = w / 2; const cy = h / 2;
-    const count = this.isMobile ? 350 : 700;
-    const now = performance.now();
-    this.introParticles = Array.from({ length: count }, () => {
+    const count = this.isMobile ? 300 : 600;
+    this.pMain = Array.from({ length: count }, () => {
       const a = Math.random() * Math.PI * 2;
-      const d = 200 + Math.random() * Math.max(w, h) * 0.6;
+      const d = 250 + Math.random() * Math.max(w, h) * 0.65;
       const cr = Math.random();
       return {
         sx: cx + Math.cos(a) * d, sy: cy + Math.sin(a) * d,
         x: cx + Math.cos(a) * d, y: cy + Math.sin(a) * d,
-        tx: 0, ty: 0, size: Math.random() * 2 + 0.3,
-        alpha: 0, maxAlpha: 0.3 + Math.random() * 0.7,
-        color: cr < 0.5 ? 0 : cr < 0.82 ? 1 : 2,
-        delay: Math.random() * 0.8, born: now, converged: false
+        tx: 0, ty: 0,
+        r: Math.random() * 1.8 + 0.3,
+        a: 0, ma: 0.25 + Math.random() * 0.75,
+        col: cr < 0.45 ? 0 : cr < 0.78 ? 1 : 2,
+        delay: Math.random() * 0.7
       };
     });
     this.reassignTargets();
@@ -300,236 +279,446 @@ export class App implements OnInit, OnDestroy, AfterViewInit {
 
   private reassignTargets() {
     if (!this.letterTargets.length) return;
-    for (let i = 0; i < this.introParticles.length; i++) {
+    for (let i = 0; i < this.pMain.length; i++) {
       const t = this.letterTargets[i % this.letterTargets.length];
-      this.introParticles[i].tx = t.x + (Math.random() - 0.5) * 3;
-      this.introParticles[i].ty = t.y + (Math.random() - 0.5) * 3;
+      this.pMain[i].tx = t.x + (Math.random() - 0.5) * 2;
+      this.pMain[i].ty = t.y + (Math.random() - 0.5) * 2;
     }
   }
 
+  private spawnIntroForeground() {
+    const w = this.introCanvas.width; const h = this.introCanvas.height;
+    const count = this.isMobile ? 25 : 60;
+    this.pFg = Array.from({ length: count }, () => ({
+      x: Math.random() * w, y: Math.random() * h,
+      vx: (Math.random() - 0.5) * 0.35, vy: (Math.random() - 0.5) * 0.25,
+      r: Math.random() * 1.2 + 0.3, a: 0, pulse: Math.random() * Math.PI * 2,
+      col: Math.random() < 0.35 ? 0 : 1
+    }));
+  }
+
   private spawnIntroOrbits() {
-    const count = this.isMobile ? 35 : 70;
-    this.introOrbits = Array.from({ length: count }, () => ({
+    const count = this.isMobile ? 30 : 60;
+    this.pOrbit = Array.from({ length: count }, () => ({
       angle: Math.random() * Math.PI * 2,
-      radius: 80 + Math.random() * 150,
-      speed: 0.002 + Math.random() * 0.006,
-      size: Math.random() * 1.5 + 0.3,
-      alpha: 0, color: Math.random() < 0.4 ? 0 : 1,
-      inclination: (Math.random() - 0.5) * 0.6
+      radius: 100 + Math.random() * 160,
+      speed: 0.003 + Math.random() * 0.007,
+      r: Math.random() * 1.3 + 0.2,
+      a: 0,
+      incl: (Math.random() - 0.5) * 0.55
     }));
   }
 
   private spawnIntroRings() {
-    this.introRings = [
-      { radius: 90, speed: 0.12, rotation: 0, lineWidth: 0.6, alpha: 0 },
-      { radius: 130, speed: -0.08, rotation: Math.PI / 3, lineWidth: 0.4, alpha: 0 },
-      { radius: 170, speed: 0.05, rotation: Math.PI / 6, lineWidth: 0.3, alpha: 0 },
-      { radius: 210, speed: -0.03, rotation: Math.PI / 2, lineWidth: 0.2, alpha: 0 }
+    this.rings = [
+      { radius: 100, speed: 0.15, rot: 0, lw: 0.7 },
+      { radius: 145, speed: -0.1, rot: Math.PI / 3, lw: 0.5 },
+      { radius: 190, speed: 0.065, rot: Math.PI / 6, lw: 0.35 },
+      { radius: 240, speed: -0.04, rot: Math.PI / 2, lw: 0.25 }
     ];
   }
 
   private spawnIntroGeos() {
-    const shapes = [{ verts: 4, size: 30 }, { verts: 6, size: 25 }, { verts: 3, size: 22 }, { verts: 5, size: 28 }];
-    this.introGeos = shapes.map((s, i) => {
-      const verts = Array.from({ length: s.verts }, (_, j) => {
-        const a = (j / s.verts) * Math.PI * 2;
-        return { x: Math.cos(a) * s.size, y: Math.sin(a) * s.size, z: (Math.random() - 0.5) * s.size * 0.4 };
+    const shapes = [{ v: 4, s: 28 }, { v: 6, s: 22 }, { v: 3, s: 20 }, { v: 5, s: 25 }];
+    this.geos = shapes.map((sh, i) => {
+      const verts = Array.from({ length: sh.v }, (_, j) => {
+        const a = (j / sh.v) * Math.PI * 2;
+        return { x: Math.cos(a) * sh.s, y: Math.sin(a) * sh.s, z: (Math.random() - 0.5) * sh.s * 0.5 };
       });
       const edges: [number, number][] = [];
       for (let j = 0; j < verts.length; j++) {
         edges.push([j, (j + 1) % verts.length]);
         if (verts.length > 4 && j < verts.length - 2) edges.push([j, j + 2]);
       }
-      return { vertices: verts, edges, rx: Math.random() * Math.PI * 2, ry: Math.random() * Math.PI * 2, rz: Math.random() * Math.PI * 2, spinX: 0.003 + Math.random() * 0.005, spinY: 0.004 + Math.random() * 0.006, spinZ: 0.002 + Math.random() * 0.003, distance: 120 + i * 50, scale: 0.7 + Math.random() * 0.4 };
+      return {
+        verts, edges,
+        rx: Math.random() * 6.28, ry: Math.random() * 6.28, rz: Math.random() * 6.28,
+        sx: 0.004 + Math.random() * 0.005, sy: 0.005 + Math.random() * 0.006, sz: 0.003 + Math.random() * 0.003,
+        dist: 130 + i * 55, scale: 0.65 + Math.random() * 0.4
+      };
     });
   }
 
-  skipIntro() { if (!this.introTransitioning) this.finishIntro(); }
+  skipIntro() { if (!this.introTransitioning && !this.introFullyDone) this.finishIntro(); }
 
   private finishIntro() {
-    if (this.introTransitioning || this.introDone) return;
+    if (this.introTransitioning || this.introFullyDone) return;
     this.introTransitioning = true;
+    this.collapseStart = performance.now();
+  }
+
+  private completeIntroTransition() {
+    if (this.introFullyDone) return;
     this.introDone = true;
-    setTimeout(() => { this.worldVisible = true; setTimeout(() => this.onIntroComplete(), 300); }, 400);
+    this.introFullyDone = true;
+    setTimeout(() => { this.worldVisible = true; setTimeout(() => this.onIntroComplete(), 300); }, 350);
   }
 
   /* ==================== INTRO RENDER ==================== */
 
   private renderIntro(): boolean {
-    if (this.introDone) return false;
+    if (this.introFullyDone) return false;
     const ctx = this.ictx;
     const w = this.introCanvas.width; const h = this.introCanvas.height;
     const cx = w / 2; const cy = h / 2;
     const now = performance.now();
     const elapsed = (now - this.introStartTime) / 1000;
 
-    if (elapsed >= this.INTRO_MIN) { this.minimumTimeReached = true; if (this.fontsReady && this.imageReady) { this.finishIntro(); return false; } }
-    if (elapsed >= this.INTRO_MAX) { this.finishIntro(); return false; }
+    if (!this.minimumTimeReached && elapsed >= this.INTRO_MIN) { this.minimumTimeReached = true; this.checkIntroReady(); }
+    if (elapsed >= this.INTRO_MAX && !this.introTransitioning) this.finishIntro();
 
-    const p2s = 0.8, p2e = 2.2, p3s = 1.8;
-    const fadeStart = this.INTRO_MAX - 1.2;
-    let ga = 1;
-    if (elapsed > fadeStart) ga = Math.max(0, 1 - (elapsed - fadeStart) / 1.2);
+    /* ===== COLLAPSE PHASE ===== */
+    if (this.introTransitioning) {
+      const ct = (now - this.collapseStart) / 1000;
+      if (ct >= this.COLLAPSE_DUR + 0.5) {
+        this.completeIntroTransition();
+        return false;
+      }
+      return this.renderCollapse(ctx, w, h, cx, cy, ct);
+    }
 
+    /* ===== NORMAL PHASES ===== */
+
+    /* Fade: 0.6s at end */
+    const fadeStart = this.INTRO_MAX - 1.0;
+    let masterAlpha = 1;
+    if (elapsed > fadeStart) masterAlpha = Math.max(0, 1 - (elapsed - fadeStart) / 1.0);
+
+    /* Phase boundaries */
+    const P1_END = 1.4;     /* Emergence end */
+    const P2_START = 1.0;   /* Convergence overlap */
+    const P2_END = 3.0;     /* Convergence end */
+    const P3_START = 2.6;   /* Text reveal start */
+    const P3_LIFE = 3.8;    /* Letter life start */
+
+    /* Clear */
     ctx.globalAlpha = 1;
     ctx.fillStyle = '#030409';
     ctx.fillRect(0, 0, w, h);
-    ctx.globalAlpha = ga;
+    ctx.globalAlpha = masterAlpha;
 
-    /* Background glow */
-    const br = 0.5 + 0.5 * Math.sin(elapsed * 0.8);
-    const bg = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.min(w, h) * 0.4);
-    bg.addColorStop(0, `rgba(196,154,108,${0.04 * br})`);
-    bg.addColorStop(1, 'rgba(3,4,9,0)');
-    ctx.fillStyle = bg; ctx.fillRect(0, 0, w, h);
+    /* ---- Background atmosphere ---- */
+    const breath = 0.5 + 0.5 * Math.sin(elapsed * 0.7);
+    const atmGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.min(w, h) * 0.45);
+    atmGrad.addColorStop(0, `rgba(196,154,108,${0.035 * breath})`);
+    atmGrad.addColorStop(0.5, `rgba(122,168,204,${0.012 * breath})`);
+    atmGrad.addColorStop(1, 'rgba(3,4,9,0)');
+    ctx.fillStyle = atmGrad;
+    ctx.fillRect(0, 0, w, h);
 
-    /* Geometric wireframes */
-    if (elapsed > 0.2) {
-      const ga2 = Math.min(0.12, (elapsed - 0.2) * 0.06);
-      for (const g of this.introGeos) {
-        g.rx += g.spinX; g.ry += g.spinY; g.rz += g.spinZ;
-        const oa = elapsed * 0.2 + g.distance * 0.01;
-        const gx = cx + Math.cos(oa) * g.distance * 0.3;
-        const gy = cy + Math.sin(oa * 0.7) * g.distance * 0.2;
+    /* ---- Orbital rings ---- */
+    if (elapsed > 0.3) {
+      const ra = Math.min(0.9, (elapsed - 0.3) * 0.5);
+      for (const r of this.rings) {
+        r.rot += r.speed * 0.016;
+        const alpha = ra * (0.045 + 0.025 * Math.sin(elapsed * 0.9 + r.radius * 0.01));
+        ctx.save(); ctx.translate(cx, cy); ctx.rotate(r.rot);
+        ctx.beginPath(); ctx.ellipse(0, 0, r.radius, r.radius * 0.32, 0, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(122,168,204,${alpha})`; ctx.lineWidth = r.lw; ctx.stroke();
+        /* orbital dot */
+        const da = elapsed * r.speed * 2;
+        const ox = Math.cos(da) * r.radius, oy = Math.sin(da) * r.radius * 0.32;
+        ctx.beginPath(); ctx.arc(ox, oy, 1.8, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(196,154,108,${alpha * 3.5})`; ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    /* ---- Geometric wireframes ---- */
+    if (elapsed > 0.5) {
+      const ga = Math.min(0.1, (elapsed - 0.5) * 0.05);
+      for (const g of this.geos) {
+        g.rx += g.sx; g.ry += g.sy; g.rz += g.sz;
+        const oa = elapsed * 0.18 + g.dist * 0.012;
+        const gx = cx + Math.cos(oa) * g.dist * 0.28;
+        const gy = cy + Math.sin(oa * 0.7) * g.dist * 0.2;
         ctx.save(); ctx.translate(gx, gy);
         const cX = Math.cos(g.rx), sX = Math.sin(g.rx), cY = Math.cos(g.ry), sY = Math.sin(g.ry), cZ = Math.cos(g.rz), sZ = Math.sin(g.rz);
-        const proj = g.vertices.map(v => {
+        const proj = g.verts.map(v => {
           let x = v.x * g.scale, y = v.y * g.scale, z = v.z * g.scale;
           let ny = y * cX - z * sX, nz = y * sX + z * cX; y = ny; z = nz;
           let nx = x * cY + z * sY; nz = -x * sY + z * cY; x = nx; z = nz;
           nx = x * cZ - y * sZ; ny = x * sZ + y * cZ; x = nx; y = ny;
           const p = 400 / (400 + z);
-          return { x: x * p, y: y * p, z };
+          return { x: x * p, y: y * p };
         });
-        ctx.strokeStyle = `rgba(122,168,204,${ga2})`; ctx.lineWidth = 0.4;
-        for (const [a, b] of g.edges) { if (proj[a] && proj[b]) { ctx.beginPath(); ctx.moveTo(proj[a].x, proj[a].y); ctx.lineTo(proj[b].x, proj[b].y); ctx.stroke(); } }
-        for (const p of proj) { ctx.beginPath(); ctx.arc(p.x, p.y, 1, 0, Math.PI * 2); ctx.fillStyle = `rgba(196,154,108,${ga2 * 0.8})`; ctx.fill(); }
+        ctx.strokeStyle = `rgba(122,168,204,${ga})`; ctx.lineWidth = 0.4;
+        for (const [a, b] of g.edges) {
+          if (proj[a] && proj[b]) { ctx.beginPath(); ctx.moveTo(proj[a].x, proj[a].y); ctx.lineTo(proj[b].x, proj[b].y); ctx.stroke(); }
+        }
+        for (const p of proj) {
+          ctx.beginPath(); ctx.arc(p.x, p.y, 1, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(196,154,108,${ga * 0.7})`; ctx.fill();
+        }
         ctx.restore();
       }
     }
 
-    /* Orbital rings */
-    const ra = Math.min(1, elapsed * 0.5);
-    for (const r of this.introRings) {
-      r.rotation += r.speed * 0.016;
-      r.alpha = ra * (0.06 + 0.03 * Math.sin(elapsed + r.radius * 0.01));
-      ctx.save(); ctx.translate(cx, cy); ctx.rotate(r.rotation);
-      ctx.beginPath(); ctx.ellipse(0, 0, r.radius, r.radius * 0.35, 0, 0, Math.PI * 2);
-      ctx.strokeStyle = `rgba(122,168,204,${r.alpha})`; ctx.lineWidth = r.lineWidth; ctx.stroke();
-      const da = elapsed * r.speed * 2;
-      ctx.beginPath(); ctx.arc(Math.cos(da) * r.radius, Math.sin(da) * r.radius * 0.35, 1.5, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(196,154,108,${r.alpha * 3})`; ctx.fill();
-      ctx.restore();
-    }
-
-    /* Main particles */
-    for (const p of this.introParticles) {
-      const age = (now - p.born) / 1000 - p.delay;
-      if (age < 0) continue;
-      if (elapsed < p2s) {
-        p.x += Math.sin(elapsed * 0.5 + p.sx * 0.01) * 0.2;
-        p.y += Math.cos(elapsed * 0.4 + p.sy * 0.01) * 0.15;
-        p.alpha = Math.min(p.maxAlpha * 0.4, age * 0.5);
-      } else if (elapsed < p2e) {
-        const prog = Math.min(1, (elapsed - p2s) / (p2e - p2s));
-        const ease = 1 - Math.pow(1 - prog, 3);
-        p.x += (p.tx - p.x) * ease * 0.06;
-        p.y += (p.ty - p.y) * ease * 0.06;
-        p.alpha = Math.min(p.maxAlpha, 0.3 + prog * 0.7);
-        p.converged = prog > 0.85;
+    /* ---- Main particles ---- */
+    for (const p of this.pMain) {
+      if (elapsed < P1_END) {
+        /* EMERGENCE: drift */
+        const fade = Math.min(1, elapsed * 0.8);
+        p.x += Math.sin(elapsed * 0.4 + p.sx * 0.008) * 0.18;
+        p.y += Math.cos(elapsed * 0.35 + p.sy * 0.008) * 0.14;
+        p.a = Math.min(p.ma * 0.35, elapsed * 0.28);
+      } else if (elapsed < P2_END) {
+        /* CONVERGENCE: spring to targets */
+        const cp = Math.min(1, (elapsed - P2_START) / (P2_END - P2_START));
+        const ease = cp < 0.5 ? 2 * cp * cp : 1 - Math.pow(-2 * cp + 2, 2) / 2;
+        p.x += (p.tx - p.x) * ease * 0.055;
+        p.y += (p.ty - p.y) * ease * 0.055;
+        p.a = Math.min(p.ma, 0.2 + cp * 0.8);
       } else {
-        p.x = p.tx + Math.sin(elapsed * 1.5 + p.tx * 0.02) * 0.3;
-        p.y = p.ty + Math.cos(elapsed * 1.2 + p.ty * 0.02) * 0.2;
-        p.alpha = p.maxAlpha * (0.8 + 0.2 * Math.sin(elapsed * 2 + p.tx * 0.01));
-        p.converged = true;
+        /* HELD in position with breathing */
+        p.x = p.tx + Math.sin(elapsed * 1.3 + p.tx * 0.015) * 0.3;
+        p.y = p.ty + Math.cos(elapsed * 1.05 + p.ty * 0.015) * 0.22;
+        p.a = p.ma * (0.75 + 0.25 * Math.sin(elapsed * 1.8 + p.tx * 0.008));
       }
-      if (p.alpha > 0.01) {
-        const cols = [[196,154,108],[122,168,204],[220,220,230]];
-        const c = cols[p.color];
-        ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(${c[0]},${c[1]},${c[2]},${p.alpha})`; ctx.fill();
+      if (p.a > 0.008) {
+        const cols = [[196,154,108],[122,168,204],[210,210,220]];
+        const c = cols[p.col];
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${c[0]},${c[1]},${c[2]},${p.a})`; ctx.fill();
       }
     }
 
-    /* Energy waves */
-    if (elapsed > p3s) {
-      for (let i = 0; i < 3; i++) {
-        const wt = elapsed - p3s - i * 0.6;
-        if (wt > 0 && wt < 2) {
-          const wp = wt / 2;
-          ctx.beginPath(); ctx.arc(cx, cy, 30 + wp * Math.max(w, h) * 0.5, 0, Math.PI * 2);
-          ctx.strokeStyle = `rgba(196,154,108,${0.08 * (1 - wp)})`; ctx.lineWidth = 0.8; ctx.stroke();
+    /* ---- Foreground ambient particles ---- */
+    for (const p of this.pFg) {
+      p.x += p.vx; p.y += p.vy; p.pulse += 0.007;
+      if (p.x < -10) p.x = w + 10; if (p.x > w + 10) p.x = -10;
+      if (p.y < -10) p.y = h + 10; if (p.y > h + 10) p.y = -10;
+      if (elapsed > 0.3) p.a = Math.min(p.a + 0.003, 0.1 + 0.08 * Math.sin(p.pulse));
+      const cols2 = [[196,154,108],[122,168,204]];
+      const cc = cols2[p.col];
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${cc[0]},${cc[1]},${cc[2]},${p.a})`; ctx.fill();
+    }
+
+    /* ---- Energy waves ---- */
+    if (elapsed > P2_START + 0.3) {
+      for (let i = 0; i < 4; i++) {
+        const wt = elapsed - P2_START - 0.3 - i * 0.5;
+        if (wt > 0 && wt < 2.5) {
+          const wp = wt / 2.5;
+          const radius = 25 + wp * Math.max(w, h) * 0.55;
+          ctx.beginPath(); ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+          ctx.strokeStyle = `rgba(196,154,108,${0.065 * (1 - wp)})`;
+          ctx.lineWidth = 0.9; ctx.stroke();
         }
       }
     }
 
-    /* Light streaks */
-    if (elapsed > p2s) {
-      const sa = Math.min(0.04, (elapsed - p2s) * 0.01);
-      for (let i = 0; i < (this.isMobile ? 3 : 6); i++) {
-        const a = (i / 6) * Math.PI * 2 + elapsed * 0.3;
-        const len = 60 + Math.sin(elapsed * 2 + i) * 30;
-        const sx = cx + Math.cos(a) * 50, sy = cy + Math.sin(a) * 50 * 0.35;
-        const ex = cx + Math.cos(a) * (50 + len), ey = cy + Math.sin(a) * (50 + len) * 0.35;
-        const gr = ctx.createLinearGradient(sx, sy, ex, ey);
-        gr.addColorStop(0, `rgba(196,154,108,${sa})`); gr.addColorStop(1, 'rgba(196,154,108,0)');
-        ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(ex, ey); ctx.strokeStyle = gr; ctx.lineWidth = 0.5; ctx.stroke();
-      }
-    }
+    /* ---- "MONEIM" text ---- */
+    if (elapsed > P3_START) {
+      const tp = Math.min(1, (elapsed - P3_START) / 0.7);
+      const te = 1 - Math.pow(1 - tp, 5);
+      const fs = Math.min(w * 0.135, 135);
+      const txtFont = `600 ${fs}px 'Outfit', 'Space Grotesk', sans-serif`;
 
-    /* "MONEIM" text */
-    if (elapsed > p2s) {
-      const tp = Math.min(1, (elapsed - p2s) / 0.8);
-      const te = 1 - Math.pow(1 - tp, 4);
+      /* Glitch displacement */
       let gx = 0, gy = 0;
-      const gm = [2.4, 3.1, 3.8];
-      for (const t of gm) { if (elapsed > t && elapsed < t + 0.08) { gx = (Math.random() - 0.5) * 8; gy = (Math.random() - 0.5) * 3; } }
-      const fs = Math.min(w * 0.12, 120);
+      const glitchTimes = [P3_START + 0.6, P3_START + 1.2, P3_START + 2.0, P3_LIFE + 0.8, P3_LIFE + 1.8];
+      for (const gt of glitchTimes) {
+        if (elapsed > gt && elapsed < gt + 0.06) { gx = (Math.random() - 0.5) * 10; gy = (Math.random() - 0.5) * 4; }
+      }
+
+      /* Shadow depth */
       ctx.save();
-      ctx.shadowColor = `rgba(196,154,108,${0.3 + 0.15 * Math.sin(elapsed * 1.5)})`;
-      ctx.shadowBlur = 40;
-      ctx.fillStyle = `rgba(232,234,240,${te * 0.95})`;
-      ctx.font = `700 ${fs}px 'Space Grotesk', sans-serif`;
-      ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.letterSpacing = '0.12em';
+      ctx.shadowColor = `rgba(196,154,108,${0.35 * te})`;
+      ctx.shadowBlur = 55;
+      ctx.shadowOffsetX = 0; ctx.shadowOffsetY = 3;
+      ctx.fillStyle = `rgba(232,234,240,${te * 0.96})`;
+      ctx.font = txtFont; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       ctx.fillText('MONEIM', cx + gx, cy + gy);
       ctx.restore();
 
-      if (Math.abs(gx) > 1) {
+      /* Chromatic aberration */
+      if (Math.abs(gx) > 1.5) {
         ctx.save(); ctx.globalCompositeOperation = 'screen';
-        ctx.fillStyle = `rgba(196,154,108,0.15)`;
-        ctx.font = `700 ${fs}px 'Space Grotesk', sans-serif`;
-        ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.letterSpacing = '0.12em';
-        ctx.fillText('MONEIM', cx + gx * 2, cy + gy);
-        ctx.fillStyle = `rgba(122,168,204,0.1)`;
-        ctx.fillText('MONEIM', cx - gx * 1.5, cy - gy);
+        ctx.font = txtFont; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillStyle = `rgba(196,154,108,0.18)`;
+        ctx.fillText('MONEIM', cx + gx * 2.2, cy + gy * 0.8);
+        ctx.fillStyle = `rgba(122,168,204,0.12)`;
+        ctx.fillText('MONEIM', cx - gx * 1.7, cy - gy * 0.6);
         ctx.globalCompositeOperation = 'source-over'; ctx.restore();
       }
 
-      if (elapsed > p3s) {
-        const subA = Math.min(0.5, (elapsed - p3s) * 0.4);
+      /* Scanline sweep */
+      if (elapsed > P3_START + 0.15 && elapsed < P3_START + 3) {
+        const sp = (elapsed - P3_START - 0.15) / 2.85;
+        const scanX = cx - fs * 3 + sp * fs * 6;
+        const sg = ctx.createLinearGradient(scanX - 2, 0, scanX + 2, 0);
+        sg.addColorStop(0, 'rgba(196,154,108,0)');
+        sg.addColorStop(0.5, `rgba(196,154,108,${0.07 * te})`);
+        sg.addColorStop(1, 'rgba(196,154,108,0)');
+        ctx.fillStyle = sg; ctx.fillRect(scanX - 2, cy - fs * 0.4, 4, fs * 0.8);
+      }
+
+      /* Letter breathing distortion */
+      if (elapsed > P3_LIFE) {
+        const breathAmt = Math.min(1, (elapsed - P3_LIFE) * 0.5);
+        const bScale = 1 + breathAmt * 0.004 * Math.sin(elapsed * 1.2);
+        const bSkew = breathAmt * 0.002 * Math.sin(elapsed * 0.9 + 1);
+        ctx.save();
+        ctx.translate(cx, cy); ctx.scale(bScale, 1 + bSkew); ctx.translate(-cx, -cy);
+        ctx.clearRect(cx - fs * 3, cy - fs * 0.45, fs * 6, fs * 0.9);
+        ctx.fillStyle = '#030409';
+        ctx.fillRect(cx - fs * 3, cy - fs * 0.45, fs * 6, fs * 0.9);
+        ctx.shadowColor = `rgba(196,154,108,${0.3 * te})`;
+        ctx.shadowBlur = 50;
+        ctx.fillStyle = `rgba(232,234,240,${te * 0.96})`;
+        ctx.font = txtFont; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText('MONEIM', cx, cy);
+        ctx.restore();
+      }
+
+      /* Subtitle */
+      if (elapsed > P3_LIFE + 0.2) {
+        const subA = Math.min(0.5, (elapsed - P3_LIFE - 0.2) * 0.35);
         ctx.fillStyle = `rgba(138,144,160,${subA})`;
-        ctx.font = `300 ${Math.min(w * 0.016, 11)}px 'JetBrains Mono', monospace`;
+        ctx.font = `300 ${Math.min(w * 0.015, 10)}px 'JetBrains Mono', monospace`;
         ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        ctx.fillText('PRINCIPAL SOFTWARE ENGINEER', cx, cy + fs * 0.6);
+        ctx.fillText('PRINCIPAL SOFTWARE ENGINEER', cx, cy + fs * 0.58);
       }
     }
 
-    /* Corner brackets */
-    if (elapsed > 0.5) {
-      const ba = 0.08 * Math.min(1, (elapsed - 0.5) * 0.4);
-      const bs = Math.min(w, h) * 0.07;
+    /* ---- Corner brackets ---- */
+    if (elapsed > 1.0) {
+      const ba = Math.min(0.08, (elapsed - 1.0) * 0.04);
+      const bs = Math.min(w, h) * 0.065;
       ctx.strokeStyle = `rgba(196,154,108,${ba})`; ctx.lineWidth = 0.8;
-      [[cx - bs * 2.2, cy - bs * 1.5], [cx + bs * 2.2, cy - bs * 1.5], [cx + bs * 2.2, cy + bs * 1.5], [cx - bs * 2.2, cy + bs * 1.5]].forEach(([x, y], i) => {
-        const dx = i % 2 === 0 ? 1 : -1, dy = i < 2 ? 1 : -1;
-        ctx.beginPath(); ctx.moveTo(x + dx * bs * 0.3, y); ctx.lineTo(x, y); ctx.lineTo(x, y + dy * bs * 0.3); ctx.stroke();
+      const corners = [
+        [cx - bs * 2.3, cy - bs * 1.6], [cx + bs * 2.3, cy - bs * 1.6],
+        [cx + bs * 2.3, cy + bs * 1.6], [cx - bs * 2.3, cy + bs * 1.6]
+      ];
+      corners.forEach(([x, y], i) => {
+        const dx = i % 2 === 0 ? 1 : -1; const dy = i < 2 ? 1 : -1;
+        ctx.beginPath();
+        ctx.moveTo(x + dx * bs * 0.28, y); ctx.lineTo(x, y); ctx.lineTo(x, y + dy * bs * 0.28);
+        ctx.stroke();
       });
     }
 
-    /* Vignette */
-    const vig = ctx.createRadialGradient(cx, cy, Math.min(w, h) * 0.25, cx, cy, Math.min(w, h) * 0.7);
-    vig.addColorStop(0, 'rgba(3,4,9,0)'); vig.addColorStop(1, 'rgba(3,4,9,0.5)');
+    /* ---- Light streaks ---- */
+    if (elapsed > P2_START) {
+      const sa = Math.min(0.04, (elapsed - P2_START) * 0.01);
+      const count = this.isMobile ? 3 : 5;
+      for (let i = 0; i < count; i++) {
+        const a = (i / count) * Math.PI * 2 + elapsed * 0.25;
+        const len = 70 + Math.sin(elapsed * 1.8 + i * 1.2) * 35;
+        const r1 = 55; const r2 = r1 + len;
+        const sx = cx + Math.cos(a) * r1, sy = cy + Math.sin(a) * r1 * 0.32;
+        const ex = cx + Math.cos(a) * r2, ey = cy + Math.sin(a) * r2 * 0.32;
+        const lg = ctx.createLinearGradient(sx, sy, ex, ey);
+        lg.addColorStop(0, `rgba(196,154,108,${sa})`);
+        lg.addColorStop(1, 'rgba(196,154,108,0)');
+        ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(ex, ey);
+        ctx.strokeStyle = lg; ctx.lineWidth = 0.5; ctx.stroke();
+      }
+    }
+
+    /* ---- Vignette ---- */
+    const vig = ctx.createRadialGradient(cx, cy, Math.min(w, h) * 0.22, cx, cy, Math.min(w, h) * 0.72);
+    vig.addColorStop(0, 'rgba(3,4,9,0)');
+    vig.addColorStop(1, 'rgba(3,4,9,0.55)');
     ctx.fillStyle = vig; ctx.fillRect(0, 0, w, h);
+
+    /* ---- Scanlines overlay ---- */
+    if (elapsed > 1.5) {
+      const slA = Math.min(0.025, (elapsed - 1.5) * 0.008);
+      ctx.fillStyle = `rgba(0,0,0,${slA})`;
+      for (let y = 0; y < h; y += 3) ctx.fillRect(0, y, w, 1);
+    }
+
     ctx.globalAlpha = 1;
+    return true;
+  }
+
+  /* ---- COLLAPSE ---- */
+
+  private renderCollapse(ctx: CanvasRenderingContext2D, w: number, h: number, cx: number, cy: number, ct: number): boolean {
+    const progress = Math.min(1, ct / this.COLLAPSE_DUR);
+    const spiralAccel = progress * progress;
+    const spiralAngle = spiralAccel * Math.PI * 4;
+
+    /* Background darken */
+    ctx.fillStyle = '#030409';
+    ctx.fillRect(0, 0, w, h);
+
+    /* Collapsing particles */
+    const collapseR = Math.max(w, h) * 0.75 * (1 - progress);
+    for (let i = 0; i < this.pMain.length; i++) {
+      const p = this.pMain[i];
+      const targetR = Math.sqrt((p.tx - cx) ** 2 + (p.ty - cy) ** 2);
+      const baseAngle = Math.atan2(p.ty - cy, p.tx - cx);
+      const collapseAngle = baseAngle + spiralAngle * (0.5 + (i % 5) * 0.1);
+      const cr = targetR * (1 - progress * 0.98);
+      const px = cx + Math.cos(collapseAngle) * cr;
+      const py = cy + Math.sin(collapseAngle) * cr;
+      const alpha = p.ma * (1 - progress * 0.6);
+      const size = p.r * (1 + progress * 1.5);
+      const cols = [[196,154,108],[122,168,204],[210,210,220]];
+      const c = cols[p.col];
+
+      /* Trail streak */
+      if (progress > 0.15) {
+        const trailLen = progress * 18;
+        const tx2 = px - Math.cos(collapseAngle) * trailLen;
+        const ty2 = py - Math.sin(collapseAngle) * trailLen;
+        const tg = ctx.createLinearGradient(tx2, ty2, px, py);
+        tg.addColorStop(0, 'rgba(196,154,108,0)');
+        tg.addColorStop(1, `rgba(${c[0]},${c[1]},${c[2]},${alpha * 0.4})`);
+        ctx.beginPath(); ctx.moveTo(tx2, ty2); ctx.lineTo(px, py);
+        ctx.strokeStyle = tg; ctx.lineWidth = size * 0.6; ctx.stroke();
+      }
+
+      ctx.beginPath(); ctx.arc(px, py, size, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${c[0]},${c[1]},${c[2]},${alpha})`; ctx.fill();
+    }
+
+    /* Text scaling down + fading */
+    const txtAlpha = Math.max(0, 1 - progress * 1.4);
+    if (txtAlpha > 0.01) {
+      const scale = 1 - progress * 0.3;
+      const fs = Math.min(w * 0.135, 135) * scale;
+      ctx.save();
+      ctx.translate(cx, cy); ctx.scale(scale, scale); ctx.translate(-cx, -cy);
+      ctx.shadowColor = `rgba(196,154,108,${0.3 * txtAlpha})`;
+      ctx.shadowBlur = 45 * (1 + progress);
+      ctx.fillStyle = `rgba(232,234,240,${txtAlpha * 0.96})`;
+      ctx.font = `600 ${fs}px 'Outfit', 'Space Grotesk', sans-serif`;
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText('MONEIM', cx, cy);
+      ctx.restore();
+    }
+
+    /* Central flash */
+    if (progress > 0.6) {
+      const fp = (progress - 0.6) / 0.4;
+      const flash = fp < 0.5 ? fp * 2 : 2 - fp * 2;
+      const flashR = 5 + flash * 180;
+      const fg = ctx.createRadialGradient(cx, cy, 0, cx, cy, flashR);
+      fg.addColorStop(0, `rgba(255,255,255,${flash * 0.95})`);
+      fg.addColorStop(0.3, `rgba(196,154,108,${flash * 0.6})`);
+      fg.addColorStop(1, 'rgba(196,154,108,0)');
+      ctx.fillStyle = fg;
+      ctx.fillRect(cx - flashR, cy - flashR, flashR * 2, flashR * 2);
+
+      /* Expanding ring */
+      ctx.beginPath();
+      ctx.arc(cx, cy, flashR * 0.8, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(196,154,108,${flash * 0.4})`;
+      ctx.lineWidth = 1.5; ctx.stroke();
+    }
+
+    /* Final black wipe */
+    if (ct > this.COLLAPSE_DUR) {
+      const wipe = Math.min(1, (ct - this.COLLAPSE_DUR) / 0.5);
+      ctx.fillStyle = `rgba(3,4,9,${wipe})`;
+      ctx.fillRect(0, 0, w, h);
+    }
+
     return true;
   }
 
@@ -763,7 +952,6 @@ export class App implements OnInit, OnDestroy, AfterViewInit {
     const positions = this.getMetricPositions();
     const data = [{ target: 8, plus: true }, { target: 4, plus: false }, { target: 6, plus: false }, { target: 2, plus: false }];
 
-    /* Ambient particles */
     for (const p of this.metricsParticles) {
       p.x += p.vx; p.y += p.vy; p.pulse += 0.008;
       if (p.x < 0) p.x = w; if (p.x > w) p.x = 0;
@@ -776,11 +964,9 @@ export class App implements OnInit, OnDestroy, AfterViewInit {
       ctx.fillStyle = `rgba(122,168,204,${p.a * (0.5 + 0.5 * Math.sin(p.pulse))})`; ctx.fill();
     }
 
-    /* Axis line */
     ctx.beginPath(); ctx.moveTo(w * 0.05, h / 2); ctx.lineTo(w * 0.95, h / 2);
     ctx.strokeStyle = `rgba(196,154,108,${Math.min(0.06, elapsed * 0.03)})`; ctx.lineWidth = 0.5; ctx.stroke();
 
-    /* Connecting lines */
     if (elapsed > 0.5) {
       const ca = Math.min(0.04, (elapsed - 0.5) * 0.02);
       for (let i = 0; i < positions.length; i++) for (let j = i + 1; j < positions.length; j++) {
@@ -789,13 +975,11 @@ export class App implements OnInit, OnDestroy, AfterViewInit {
       }
     }
 
-    /* Numbers */
     this.metricsHover = -1;
     for (let i = 0; i < positions.length; i++) {
       const pos = positions[i]; const d = data[i];
       const stagger = i * 0.25; const me = Math.max(0, elapsed - stagger);
-      const cp = Math.min(1, me / 1.2);
-      const ce = 1 - Math.pow(1 - cp, 4);
+      const cp = Math.min(1, me / 1.2); const ce = 1 - Math.pow(1 - cp, 4);
       this.metricsAnim[i] = d.target * ce;
       const dv = Math.round(this.metricsAnim[i]);
 
@@ -805,7 +989,6 @@ export class App implements OnInit, OnDestroy, AfterViewInit {
       const hs = hover ? 1.05 : 1;
 
       if (me > 0) {
-        /* Outline shadow */
         ctx.save(); ctx.translate(pos.x, pos.y); ctx.scale(hs, hs);
         ctx.font = `900 ${pos.s}px 'Space Grotesk', sans-serif`;
         ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
@@ -814,7 +997,6 @@ export class App implements OnInit, OnDestroy, AfterViewInit {
         ctx.strokeText(dv + (d.plus ? '+' : ''), 0, 0);
         ctx.restore();
 
-        /* Main number */
         const na = Math.min(1, me * 0.6);
         ctx.save(); ctx.translate(pos.x, pos.y); ctx.scale(hs, hs);
         if (hover) { ctx.shadowColor = 'rgba(196,154,108,0.3)'; ctx.shadowBlur = 30; }
@@ -826,7 +1008,6 @@ export class App implements OnInit, OnDestroy, AfterViewInit {
       }
     }
 
-    /* Scan sweep */
     if (elapsed > 0.3 && elapsed < 4) {
       const sp = (elapsed - 0.3) / 3.7;
       const sx = w * 0.05 + sp * w * 0.9;
@@ -835,7 +1016,6 @@ export class App implements OnInit, OnDestroy, AfterViewInit {
       ctx.fillStyle = sg; ctx.fillRect(sx - 2, 0, 4, h);
     }
 
-    /* Hover connections */
     if (this.metricsHover >= 0) {
       const hp = positions[this.metricsHover];
       for (const p of this.metricsParticles) {
