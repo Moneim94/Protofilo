@@ -22,7 +22,7 @@
   animation: intro-bg-exit .32s ease .8s forwards;
 }
 .intro-stage {
-  position: relative; width: min(420px, 90vw); height: 150px;
+  position: relative; width: min(400px, 88vw); height: min(400px, 78vh);
   animation: intro-exit .26s cubic-bezier(.5,0,.75,0) .8s forwards;
 }
 .intro-point {
@@ -35,18 +35,24 @@
 }
 
 .intro-geom { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; }
-.br {
-  stroke: rgba(79,70,229,.34); stroke-width: 1;
-  stroke-dasharray: 90; stroke-dashoffset: 90;
-  animation: bracket-draw .5s cubic-bezier(.25,.6,.35,1) .52s forwards;
+.g-ring {
+  fill: none; stroke: rgba(79,70,229,.45); stroke-width: 1.2;
+  stroke-dasharray: 1060; stroke-dashoffset: 1060;
+  animation: ring-draw .6s cubic-bezier(.25,.6,.35,1) .5s forwards;
+}
+.g-ring-2 {
+  stroke: rgba(124,58,237,.18); stroke-width: .8;
+  stroke-dasharray: 1210; stroke-dashoffset: 1210;
+  animation: ring-draw .65s cubic-bezier(.25,.6,.35,1) .58s forwards;
 }
 .nd {
-  fill: #fff; stroke: var(--accent); stroke-width: 1.2;
-  opacity: 0; animation: node-in .3s ease .76s forwards;
+  fill: #fff; stroke: var(--accent); stroke-width: 1.3;
+  opacity: 0; animation: node-in .32s ease .78s forwards;
 }
-.nd-t { animation-delay: .7s; }
-.nd-b { animation-delay: .74s; }
-.br-mid { stroke-width: .7; opacity: 0; animation: mid-in .3s ease .8s forwards; }
+.nd-a { animation-delay: .72s; }
+.nd-b { animation-delay: .78s; }
+.nd-c { animation-delay: .84s; }
+.nd-d { animation-delay: .9s; }
 
 .intro-word {
   position: absolute; left: 50%; top: 50%;
@@ -105,9 +111,8 @@
   0% { opacity: 0; transform: translateY(18px) scale(.9); filter: blur(6px); }
   100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
 }
-@keyframes bracket-draw { to { stroke-dashoffset: 0; } }
+@keyframes ring-draw { to { stroke-dashoffset: 0; } }
 @keyframes node-in { to { opacity: 1; } }
-@keyframes mid-in { to { opacity: .6; } }
 @keyframes line-draw { to { transform: scaleX(1); } }
 @keyframes tick-in { to { opacity: 1; } }
 @keyframes sweep-pass {
@@ -125,15 +130,16 @@
   .intro .l { animation: none !important; opacity: 1 !important; transform: none !important; filter: none !important; }
   .intro-stage, .intro-geom, .intro-point, .intro-word, .intro-line, .intro-sweep,
   .intro-stage .tick { animation-duration: .001s !important; animation-delay: .3s !important; opacity: 1; }
+  .intro .g-ring, .intro .nd { display: none; }
   .intro { animation: intro-exit .25s ease .55s forwards; }
 }
 
 @media (max-width: 560px) {
-  .intro-stage { width: min(340px, 92vw); height: 130px; }
+  .intro-stage { width: min(340px, 92vw); height: min(340px, 70vh); }
   .intro-word { font-size: clamp(2.2rem, 11vw, 2.8rem); letter-spacing: .14em; padding-right: .14em; }
   .intro-line { top: calc(50% + 34px); }
-  .br { stroke-width: .8; }
-  .nd { r: 1.8; }
+  .g-ring { stroke-width: 1; }
+  .g-ring-2 { stroke-width: .7; }
 }
 
 .site { opacity: 1; }
