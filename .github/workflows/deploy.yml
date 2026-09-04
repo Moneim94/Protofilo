@@ -22,14 +22,14 @@ jobs:
         with:
           node-version: 20
           cache: npm
-          cache-dependency-path: Protofilo/Protofilo/package-lock.json
+          cache-dependency-path: Protofilo/Protofilo/Protofilo/package-lock.json
       - run: npm ci
-        working-directory: Protofilo/Protofilo
+        working-directory: Protofilo/Protofilo/Protofilo
       - run: npm run build -- --base-href=/Protofilo/
-        working-directory: Protofilo/Protofilo
+        working-directory: Protofilo/Protofilo/Protofilo
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: Protofilo/Protofilo/dist/Protofilo/browser
+          path: Protofilo/Protofilo/Protofilo/dist/Protofilo/browser
 
   deploy:
     needs: build
