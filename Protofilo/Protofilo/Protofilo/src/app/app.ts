@@ -30,6 +30,7 @@ interface Edu {
 export class App implements AfterViewInit, OnDestroy {
   menuOpen = false;
   scrolled = false;
+  booted = false;
   activeSection = 'home';
   activeProject: number | null = null;
   activeArch: string | null = null;
@@ -275,6 +276,7 @@ export class App implements AfterViewInit, OnDestroy {
   ngAfterViewInit() {
     this.initScroll();
     this.initObserver();
+    setTimeout(() => { this.booted = true; }, 1150);
   }
 
   ngOnDestroy() {

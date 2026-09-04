@@ -1,12 +1,14 @@
-<!-- ================= FUTURISTIC BOOT SPINNER (auto-fades in ~1s, can never get stuck) ================= -->
-<div class="spinner" aria-hidden="true">
-  <div class="spinner-stage">
-    <div class="orbit orbit-a"><span class="sat"></span></div>
-    <div class="orbit orbit-b"><span class="sat"></span></div>
-    <div class="orbit orbit-c"><span class="sat"></span></div>
-    <div class="core">M</div>
+<!-- ================= FUTURISTIC BOOT SPINNER (removed from DOM ~1.1s, can never get stuck) ================= -->
+@if (!booted) {
+  <div class="spinner" aria-hidden="true">
+    <div class="spinner-stage">
+      <div class="orbit orbit-a"><span class="sat"></span></div>
+      <div class="orbit orbit-b"><span class="sat"></span></div>
+      <div class="orbit orbit-c"><span class="sat"></span></div>
+      <div class="core">M</div>
+    </div>
   </div>
-</div>
+}
 
 <!-- ================= SITE ================= -->
 <div class="site">
