@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, AfterViewInit, HostListener } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -16,6 +16,8 @@ export class App implements OnInit, OnDestroy, AfterViewInit {
   activeEng: string | null = null;
   openProject: number | null = null;
   private observer!: IntersectionObserver;
+
+  constructor(private cdr: ChangeDetectorRef) {}
 
   sections = [
     { id: 'about', label: 'About' },
@@ -69,8 +71,10 @@ export class App implements OnInit, OnDestroy, AfterViewInit {
   ngAfterViewInit() {
     setTimeout(() => {
       this.loaderDone = true;
+      this.cdr.detectChanges();
       setTimeout(() => {
         this.siteVisible = true;
+        this.cdr.detectChanges();
         this.initScroll();
         this.initObserver();
       }, 50);
@@ -97,6 +101,7 @@ export class App implements OnInit, OnDestroy, AfterViewInit {
           }
         }
       }
+      this.cdr.detectChanges();
     }, { passive: true });
   }
 
