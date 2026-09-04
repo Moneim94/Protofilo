@@ -2,42 +2,37 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>MONEIM â€” Digital Universe</title>
+  <title>MONEIM</title>
   <base href="/Protofilo/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="The digital universe of Ahmed Moneim â€” Principal Software Engineer. Architecture, systems, and engineering.">
-  <meta name="theme-color" content="#030409">
+  <meta name="description" content="Ahmed Moneim — Principal Software Engineer. Architecture, systems, and digital craftsmanship.">
+  <meta name="theme-color" content="#ffffff">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
 
-  <!-- Font loading â€” Outfit for MONEIM wordmark, Space Grotesk for display, Inter for body -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 
-  <!-- Preload critical assets -->
   <link rel="preload" as="image" href="logo.png">
 
-  <!-- Critical inline styles â€” prevents FOUC, shows intro immediately -->
   <style>
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-    html,body{background:#030409;color:#e8eaf0;overflow-x:hidden;-webkit-font-smoothing:antialiased}
-    body{font-family:'Inter',sans-serif}
+    html,body{background:#ffffff;color:#1a1a2e;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+    body{font-family:'Inter',system-ui,sans-serif}
     app-root{display:block;min-height:100vh}
-    .intro-fallback{position:fixed;inset:0;z-index:9999;background:#030409;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1.5rem}
-    .intro-fallback .wordmark{font-family:'Outfit',sans-serif;font-weight:600;font-size:clamp(2rem,6vw,4rem);letter-spacing:.15em;color:#e8eaf0;opacity:0;animation:wf-in .8s ease .3s forwards}
-    .intro-fallback .sub{font-family:'JetBrains Mono',monospace;font-size:.5rem;letter-spacing:.3em;color:#4a5060;opacity:0;animation:wf-in .6s ease .8s forwards}
-    @keyframes wf-in{to{opacity:1}}
+    .loader-fallback{position:fixed;inset:0;z-index:9999;background:#ffffff;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1rem;transition:opacity .4s ease}
+    .loader-fallback .lf-wordmark{font-family:'Inter',sans-serif;font-weight:600;font-size:clamp(1.6rem,4vw,2.4rem);letter-spacing:.18em;color:#1a1a2e}
+    .loader-fallback .lf-bar{width:48px;height:2px;background:#e2e4ea;border-radius:1px;overflow:hidden}
+    .loader-fallback .lf-bar::after{content:'';display:block;width:50%;height:100%;background:#6366f1;border-radius:1px;animation:lf-slide .8s ease-in-out infinite}
+    @keyframes lf-slide{0%{transform:translateX(-100%)}100%{transform:translateX(300%)}}
   </style>
 </head>
 <body>
   <app-root>
-    <!-- Fallback shown while Angular bootstraps -->
-    <div class="intro-fallback">
-      <div class="wordmark">MONEIM</div>
-      <div class="sub">LOADING UNIVERSE</div>
+    <div class="loader-fallback">
+      <div class="lf-wordmark">MONEIM</div>
+      <div class="lf-bar"></div>
     </div>
   </app-root>
 </body>
 </html>
-
-

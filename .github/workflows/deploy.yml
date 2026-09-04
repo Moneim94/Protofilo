@@ -10,8 +10,8 @@ permissions:
   id-token: write
 
 concurrency:
-  group: "pages"
-  cancel-in-progress: false
+  group: pages
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -25,7 +25,7 @@ jobs:
           cache-dependency-path: Protofilo/Protofilo/Protofilo/package-lock.json
       - run: npm ci
         working-directory: Protofilo/Protofilo/Protofilo
-      - run: npm run build -- --base-href=/Protofilo/
+      - run: npx ng build --configuration=production
         working-directory: Protofilo/Protofilo/Protofilo
       - uses: actions/upload-pages-artifact@v3
         with:

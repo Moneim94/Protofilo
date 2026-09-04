@@ -1,264 +1,248 @@
-<!-- ============ INTRO — CINEMATIC MONEIM REVEAL ============ -->
-<div class="intro" [class.done]="introDone">
-  <canvas #introCanvas class="intro-canvas"></canvas>
-  <button class="intro-skip" (click)="skipIntro()" aria-label="Skip intro">
-    <span class="is-line"></span>
-    <span class="is-text mono">SKIP</span>
-  </button>
+<!-- ============ LOADER ============ -->
+<div class="loader" [class.done]="loaderDone">
+  <div class="loader-inner">
+    <div class="loader-wordmark">MONEIM</div>
+    <div class="loader-bar"><span></span></div>
+  </div>
 </div>
 
-<!-- ============ UNIVERSE ============ -->
-<div class="universe" [class.visible]="worldVisible">
+<!-- ============ SITE ============ -->
+<div class="site" [class.visible]="siteVisible">
 
-  <!-- Ambient Field -->
-  <canvas #ambientCanvas class="ambient-field"></canvas>
-
-  <!-- Custom Cursor -->
-  <div class="cursor-ring" #cRing></div>
-  <div class="cursor-dot" #cDot></div>
-  <div class="cursor-trail">
-    @for (d of trail; track $index) {
-      <i class="cursor-tdot" [style.left.px]="d.x" [style.top.px]="d.y" [style.--i]="$index"></i>
-    }
-  </div>
-
-  <!-- Click Ripple -->
-  <div class="click-ripple" [class.active]="rippleActive" [style.left.px]="rippleX" [style.top.px]="rippleY"></div>
-
-  <!-- ============ NAVIGATION — COMMAND INTERFACE ============ -->
-  <nav class="nav-cmd" [class.scrolled]="scrolled" [class.open]="navOpen">
-    <button class="nav-trigger" (click)="toggleNav()" aria-label="Navigation">
-      <span class="nav-diamond"></span>
-    </button>
-    <span class="nav-label mono" [class.visible]="scrolled">MONEIM</span>
-    <div class="nav-panel">
-      <div class="nav-panel-inner">
-        @for (s of sections; track s.id; let i = $index) {
-          <a class="nav-item" [class.active]="currentSection === s.id" (click)="goTo(s.id)">
-            <span class="nav-idx mono">{{ (i + 1).toString().padStart(2, '0') }}</span>
-            <span class="nav-name">{{ s.label }}</span>
-            <span class="nav-line"></span>
-          </a>
+  <!-- ============ NAVIGATION ============ -->
+  <nav class="nav" [class.scrolled]="scrolled" [class.menu-open]="menuOpen">
+    <div class="nav-inner">
+      <a class="nav-brand" (click)="goTo('hero')">MONEIM</a>
+      <div class="nav-links">
+        @for (s of sections; track s.id) {
+          <a class="nav-link" [class.active]="currentSection === s.id" (click)="goTo(s.id)">{{ s.label }}</a>
         }
       </div>
+      <button class="nav-hamburger" (click)="menuOpen = !menuOpen" [attr.aria-label]="menuOpen ? 'Close menu' : 'Open menu'">
+        <span class="hamburger-line" [class.open]="menuOpen"></span>
+        <span class="hamburger-line" [class.open]="menuOpen"></span>
+      </button>
+    </div>
+    <div class="nav-mobile">
+      @for (s of sections; track s.id) {
+        <a class="nav-mobile-link" [class.active]="currentSection === s.id" (click)="goTo(s.id)">{{ s.label }}</a>
+      }
     </div>
   </nav>
 
-  <!-- Scroll Depth -->
-  <div class="depth-track">
-    <div class="depth-fill" [style.height.%]="scrollProgress"></div>
-    <span class="depth-label mono" [style.bottom.%]="scrollProgress">{{ currentLabel }}</span>
-  </div>
-
-  <!-- ============ HERO — CINEMATIC OPENING ============ -->
-  <section id="hero" class="section hero-section">
-    <canvas #heroCanvas class="hero-canvas"></canvas>
-    <div class="hero-grid" aria-hidden="true"></div>
-    <div class="hero-content">
-      <div class="hero-tag mono" data-reveal>
-        <span class="tag-line"></span>
-        <span>PRINCIPAL SOFTWARE ENGINEER</span>
+  <!-- ============ HERO ============ -->
+  <section id="hero" class="hero">
+    <div class="hero-inner">
+      <div class="hero-content">
+        <div class="hero-badge reveal">Principal Software Engineer</div>
+        <h1 class="hero-title reveal">
+          Building systems<br>
+          <span class="hero-accent">that scale.</span>
+        </h1>
+        <p class="hero-desc reveal">
+          Architecting secure, scalable digital solutions with .NET, Angular, Cloud, Identity and modern engineering practices.
+        </p>
+        <div class="hero-actions reveal">
+          <a class="btn-primary" (click)="goTo('projects')">
+            <span>View Projects</span>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10m0 0l4-4m-4 4l-4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <a class="btn-outline" href="Ahmed_Abd_ElMoniem_Resume.pdf" download>Download Resume</a>
+        </div>
       </div>
-      <h1 class="hero-title" data-reveal>
-        <span class="ht-line">
-          <span class="ht-text ht-first">AHMED</span>
-        </span>
-        <span class="ht-line ht-line-accent">
-          <span class="ht-text ht-last">MONEIM</span>
-        </span>
-      </h1>
-      <p class="hero-desc" data-reveal>Architecting systems at the intersection of<br>engineering depth and digital craftsmanship.</p>
-      <div class="hero-actions" data-reveal>
-        <button class="btn-primary" (click)="goTo('impact')">
-          <span>Explore Universe</span>
-          <span class="btn-arrow">↓</span>
-        </button>
-        <a class="btn-ghost" href="Ahmed_Abd_ElMoniem_Resume.pdf" download>Resume ↓</a>
+      <div class="hero-portrait reveal">
+        <div class="portrait-wrapper">
+          <img src="logo.png" alt="Ahmed Moneim — Principal Software Engineer" loading="eager">
+          <div class="portrait-ring"></div>
+        </div>
       </div>
     </div>
-    <div class="hero-portrait-wrap" data-reveal>
-      <div class="portrait-frame">
-        <img src="logo.png" alt="Ahmed Moneim">
-        <div class="portrait-scan"></div>
-        <div class="portrait-corner pc-tl"></div>
-        <div class="portrait-corner pc-tr"></div>
-        <div class="portrait-corner pc-bl"></div>
-        <div class="portrait-corner pc-br"></div>
-      </div>
-      <div class="portrait-data mono">
-        <span>ID // A.M.</span>
-        <span class="status-active">● ACTIVE</span>
-      </div>
-    </div>
-    <div class="hero-coords mono" aria-hidden="true">24°42'N 46°40'E</div>
-  </section>
-
-  <!-- ============ VISION ============ -->
-  <section id="vision" class="section vision-section">
-    <div class="section-inner">
-      <div class="section-tag mono" data-reveal>// 01</div>
-      <h2 class="vision-headline" data-reveal>
-        <span class="vh-line">I architect</span>
-        <span class="vh-line">the systems</span>
-        <span class="vh-line vh-dim">behind the software</span>
-        <span class="vh-line vh-stroke">that runs the future.</span>
-      </h2>
+    <div class="hero-scroll-indicator" (click)="goTo('about')">
+      <span class="mono">SCROLL</span>
+      <div class="scroll-line"></div>
     </div>
   </section>
 
-  <!-- ============ ENGINEERING IMPACT — METRICS ============ -->
-  <section id="impact" class="section impact-section" #metricsSection>
-    <canvas #metricsCanvas class="impact-canvas"></canvas>
-    <div class="impact-labels">
-      <div class="impact-label il-0" data-idx="0">
-        <span class="il-val mono">YEARS</span>
-        <span class="il-sub">IN SYSTEMS</span>
-      </div>
-      <div class="impact-label il-1" data-idx="1">
-        <span class="il-val mono">MAJOR SYSTEMS</span>
-        <span class="il-sub">ARCHITECTED</span>
-      </div>
-      <div class="impact-label il-2" data-idx="2">
-        <span class="il-val mono">CORE</span>
-        <span class="il-sub">DOMAINS</span>
-      </div>
-      <div class="impact-label il-3" data-idx="3">
-        <span class="il-val mono">REGIONS</span>
-        <span class="il-sub">OPERATING IN</span>
+  <!-- ============ ABOUT ============ -->
+  <section id="about" class="section section-alt">
+    <div class="container">
+      <span class="section-label mono reveal">About</span>
+      <div class="about-grid">
+        <div class="about-text reveal">
+          <h2 class="section-title">Engineering at the<br><span class="text-accent">intersection of depth</span><br>and craftsmanship.</h2>
+          <p class="about-body">
+            I'm a Principal Software Engineer with 8+ years of experience architecting enterprise systems that operate across healthcare, security, and infrastructure domains. My work spans the full stack — from designing distributed service architectures to building polished frontends.
+          </p>
+          <p class="about-body">
+            I believe in systems that are not just functional, but maintainable, secure, and elegant. Every architecture decision is a commitment to the teams that will build on it and the users who will depend on it.
+          </p>
+        </div>
+        <div class="about-stats reveal">
+          <div class="stat-card">
+            <span class="stat-number">8+</span>
+            <span class="stat-label">Years in<br>Systems Engineering</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-number">4</span>
+            <span class="stat-label">Major Systems<br>Architected</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-number">6</span>
+            <span class="stat-label">Core<br>Domains</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-number">2</span>
+            <span class="stat-label">Regions<br>Operating In</span>
+          </div>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- ============ ENGINEERING DIMENSION — INTERACTIVE SYSTEMS ============ -->
-  <section id="engineering" class="section engineering-section">
-    <div class="section-inner">
-      <div class="section-tag mono" data-reveal>// 02 — DIMENSION</div>
-      <h2 class="eng-headline" data-reveal>The Engineering <span class="hl-accent">Dimension</span></h2>
-      <p class="eng-sub" data-reveal>An interactive map of the systems I build.</p>
+  <!-- ============ SKILLS ============ -->
+  <section id="skills" class="section">
+    <div class="container">
+      <span class="section-label mono reveal">Expertise</span>
+      <h2 class="section-title reveal">Skills & <span class="text-accent">Engineering</span></h2>
+      <div class="skills-grid">
+        @for (cat of skillCategories; track cat.title) {
+          <div class="skill-category reveal">
+            <div class="skill-cat-header">
+              <span class="skill-cat-icon">{{ cat.icon }}</span>
+              <h3 class="skill-cat-title">{{ cat.title }}</h3>
+            </div>
+            <p class="skill-cat-desc">{{ cat.desc }}</p>
+            <div class="skill-tags">
+              @for (t of cat.techs; track t) {
+                <span class="skill-tag mono">{{ t }}</span>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
 
-      <div class="eng-machine" data-reveal>
-        <canvas #engCanvas class="eng-canvas"></canvas>
-        <div class="eng-nodes">
-          @for (n of engNodes; track n.id) {
-            <div class="eng-node" [class.active]="activeEng === n.id" [style.--x]="n.x + '%'" [style.--y]="n.y + '%'" (mouseenter)="activateEng(n.id)" (mouseleave)="deactivateEng()">
-              <span class="en-pulse"></span>
-              <span class="en-dot"></span>
-              <span class="en-label mono">{{ n.label }}</span>
+  <!-- ============ EXPERIENCE ============ -->
+  <section id="experience" class="section section-alt">
+    <div class="container">
+      <span class="section-label mono reveal">Career</span>
+      <h2 class="section-title reveal">Professional <span class="text-accent">Journey</span></h2>
+      <div class="timeline">
+        @for (j of journey; track j.period; let i = $index) {
+          <div class="tl-item reveal" [class.current]="j.current">
+            <div class="tl-marker">
+              <div class="tl-dot"></div>
+              @if (i < journey.length - 1) { <div class="tl-line-seg"></div> }
+            </div>
+            <div class="tl-card">
+              <div class="tl-header">
+                <span class="tl-period mono">{{ j.period }}</span>
+                <span class="tl-org mono" [class.current-org]="j.current">{{ j.org }}</span>
+              </div>
+              <h3 class="tl-role">{{ j.role }}</h3>
+              <p class="tl-detail mono">{{ j.place }} · {{ j.focus }}</p>
+            </div>
+          </div>
+        }
+      </div>
+      <div class="edu-section reveal">
+        <h3 class="edu-heading">Education</h3>
+        <div class="edu-grid">
+          @for (e of education; track e.title) {
+            <div class="edu-card">
+              <span class="edu-year mono">{{ e.year }}</span>
+              <h4 class="edu-title">{{ e.title }}</h4>
+              <span class="edu-org mono">{{ e.org }}</span>
             </div>
           }
         </div>
-        <div class="eng-flow mono" [class.visible]="activeEng">{{ getEngFlow() }}</div>
-      </div>
-
-      <div class="eng-stack" data-reveal>
-        <span class="stack-tag mono">CORE TECHNOLOGIES</span>
-        <div class="stack-grid">
-          @for (t of techStack; track t.name) {
-            <span class="stack-chip mono">{{ t.name }}</span>
-          }
-        </div>
       </div>
     </div>
   </section>
 
-  <!-- ============ PROJECTS — SYSTEM WORLDS ============ -->
-  <section id="work" class="section projects-section">
-    <div class="section-inner">
-      <div class="section-tag mono" data-reveal>// 03 — PORTALS</div>
-      <h2 class="proj-headline" data-reveal>Systems I've <span class="hl-accent">Built</span></h2>
-
-      <div class="proj-grid">
+  <!-- ============ PROJECTS ============ -->
+  <section id="projects" class="section">
+    <div class="container">
+      <span class="section-label mono reveal">Portfolio</span>
+      <h2 class="section-title reveal">Systems I've <span class="text-accent">Built</span></h2>
+      <div class="projects-grid">
         @for (p of projects; track p.title; let i = $index) {
-          <article class="proj-card" [class.open]="openPortal === i" data-reveal (click)="togglePortal(i)">
-            <div class="proj-visual">
-              <canvas class="proj-canvas" [attr.data-idx]="i"></canvas>
-              <div class="proj-glow" [style.--accent]="p.color"></div>
-              <div class="proj-num mono">{{ p.index }}</div>
+          <article class="project-card reveal" (click)="toggleProject(i)">
+            <div class="project-header">
+              <span class="project-index mono">{{ p.index }}</span>
+              <span class="project-domain mono" [style.color]="p.color">{{ p.domain }}</span>
             </div>
-            <div class="proj-info">
-              <span class="proj-domain mono" [style.color]="p.color">{{ p.domain }}</span>
-              <h3 class="proj-title">{{ p.title }}</h3>
-              <p class="proj-sub mono">{{ p.subtitle }}</p>
-            </div>
-            <div class="proj-expand" [class.visible]="openPortal === i">
-              <p class="proj-desc">{{ p.desc }}</p>
-              <div class="proj-tech">
+            <h3 class="project-title">{{ p.title }}</h3>
+            <p class="project-subtitle mono">{{ p.subtitle }}</p>
+            <div class="project-expand" [class.visible]="openProject === i">
+              <p class="project-desc">{{ p.desc }}</p>
+              <div class="project-tech">
                 @for (t of p.tech; track t) {
-                  <span class="tech-chip mono">{{ t }}</span>
+                  <span class="project-tag mono">{{ t }}</span>
                 }
               </div>
-              <div class="proj-arch mono">{{ p.arch }}</div>
+              <div class="project-arch mono">{{ p.arch }}</div>
             </div>
+            <span class="project-toggle mono">{{ openProject === i ? 'Collapse' : 'Details' }} →</span>
           </article>
         }
       </div>
     </div>
   </section>
 
-  <!-- ============ JOURNEY — PATH ============ -->
-  <section id="journey" class="section journey-section">
-    <div class="section-inner">
-      <div class="section-tag mono" data-reveal>// 04 — PATH</div>
-      <h2 class="journey-headline" data-reveal>The <span class="hl-accent">Path</span></h2>
-
-      <div class="timeline" data-reveal>
-        @for (j of journey; track j.period; let i = $index) {
-          <div class="tl-node" [class.current]="j.current">
-            <span class="tl-year mono">{{ j.period }}</span>
-            <div class="tl-seam">
-              <span class="tl-dot"></span>
-              <i class="tl-line"></i>
+  <!-- ============ ARCHITECTURE ============ -->
+  <section id="architecture" class="section section-alt">
+    <div class="container">
+      <span class="section-label mono reveal">Engineering</span>
+      <h2 class="section-title reveal">The Engineering <span class="text-accent">Dimension</span></h2>
+      <div class="arch-diagram reveal">
+        <div class="arch-nodes">
+          @for (n of engNodes; track n.id) {
+            <div class="arch-node" [class.active]="activeEng === n.id" [style.--x]="n.x + '%'" [style.--y]="n.y + '%'" (mouseenter)="activeEng = n.id" (mouseleave)="activeEng = null">
+              <div class="arch-node-dot"></div>
+              <span class="arch-node-label mono">{{ n.label }}</span>
             </div>
-            <div class="tl-body">
-              <h3 class="tl-role">{{ j.role }}</h3>
-              <span class="tl-place mono">{{ j.place }} · {{ j.focus }}</span>
-              <span class="tl-org mono" [class.current-org]="j.current">{{ j.org }}</span>
-            </div>
-          </div>
-        }
-      </div>
-
-      <div class="edu-grid" data-reveal>
-        @for (e of education; track e.title) {
-          <div class="edu-card">
-            <span class="edu-year mono">{{ e.year }}</span>
-            <h4 class="edu-title">{{ e.title }}</h4>
-            <span class="edu-org mono">{{ e.org }}</span>
-          </div>
-        }
+          }
+          <svg class="arch-lines" viewBox="0 0 100 100" preserveAspectRatio="none">
+            @for (n of engNodes; track n.id; let i = $index) {
+              @for (n2 of engNodes; track n2.id; let j = $index) {
+                @if (j > i) {
+                  <line [attr.x1]="n.x" [attr.y1]="n.y" [attr.x2]="n2.x" [attr.y2]="n2.y" class="arch-line" [class.active]="activeEng === n.id || activeEng === n2.id"/>
+                }
+              }
+            }
+          </svg>
+        </div>
+        <div class="arch-flow mono" [class.visible]="activeEng">{{ getEngFlow() }}</div>
       </div>
     </div>
   </section>
 
-  <!-- ============ CONTACT — SIGNAL ============ -->
-  <section id="contact" class="section contact-section">
-    <div class="contact-void">
-      <div class="contact-glow" aria-hidden="true"></div>
-      <div class="contact-center">
-        <div class="contact-wordmark" data-reveal>
-          <span class="cw-text">MONEIM</span>
-        </div>
-        <p class="contact-line" data-reveal>Let's build something extraordinary.</p>
-        <div class="contact-links" data-reveal>
-          <a class="contact-card cc-primary" href="mailto:ahmedmoneim094@gmail.com">
-            <span class="cc-label mono">EMAIL</span>
-            <span class="cc-value">ahmedmoneim094@gmail.com</span>
-            <span class="cc-arrow">→</span>
-          </a>
-          <div class="contact-card">
-            <span class="cc-label mono">PHONE</span>
-            <a class="cc-value" href="tel:+966503100847">+966 50 310 0847</a>
-          </div>
-          <div class="contact-card">
-            <span class="cc-label mono">BASE</span>
-            <span class="cc-value">Riyadh, Saudi Arabia</span>
-          </div>
-        </div>
-        <div class="contact-foot mono" data-reveal>
-          <span>AHMED MONEIM</span>
-          <span>© 2026</span>
+  <!-- ============ CONTACT ============ -->
+  <section id="contact" class="section">
+    <div class="container contact-container">
+      <span class="section-label mono reveal">Contact</span>
+      <h2 class="section-title reveal">Let's build something<br><span class="text-accent">extraordinary.</span></h2>
+      <div class="contact-cards reveal">
+        <a class="contact-card cc-primary" href="mailto:ahmedmoneim094@gmail.com">
+          <span class="cc-label mono">EMAIL</span>
+          <span class="cc-value">ahmedmoneim094@gmail.com</span>
+          <span class="cc-arrow">→</span>
+        </a>
+        <a class="contact-card" href="tel:+966503100847">
+          <span class="cc-label mono">PHONE</span>
+          <span class="cc-value">+966 50 310 0847</span>
+        </a>
+        <div class="contact-card">
+          <span class="cc-label mono">BASE</span>
+          <span class="cc-value">Riyadh, Saudi Arabia</span>
         </div>
       </div>
+      <footer class="footer reveal">
+        <span class="footer-brand mono">AHMED MONEIM</span>
+        <span class="footer-copy mono">© 2026</span>
+      </footer>
     </div>
   </section>
 
