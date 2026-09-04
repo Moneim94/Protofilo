@@ -360,12 +360,6 @@
 .ring-1 { inset: -12px; border: 1.5px dashed var(--accent-border); animation: rotate-slow 40s linear infinite; }
 .ring-2 { inset: -24px; border: 1px solid var(--border); }
 @keyframes rotate-slow { to { transform: rotate(360deg); } }
-.portrait-badge { position: absolute; display: inline-flex; align-items: center; gap: .5rem; padding: .5rem .85rem; font-size: .72rem; font-weight: 600; background: rgba(255,255,255,.9); border: 1px solid var(--border); border-radius: var(--radius-full); box-shadow: var(--shadow-md); backdrop-filter: blur(8px); }
-.badge-loc { top: 18px; left: -26px; }
-.badge-loc .pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--emerald); position: relative; }
-.badge-loc .pulse::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: var(--emerald); animation: pulse 1.8s ease-out infinite; }
-@keyframes pulse { 0% { transform: scale(1); opacity: .7; } 100% { transform: scale(2.8); opacity: 0; } }
-.badge-role { bottom: 24px; right: -20px; color: var(--accent); border-color: var(--accent-border); }
 
 .hero-scroll { position: absolute; bottom: 26px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: .5rem; cursor: pointer; z-index: 3; }
 .scroll-label { font-size: .56rem; letter-spacing: .24em; color: var(--text-muted); }
