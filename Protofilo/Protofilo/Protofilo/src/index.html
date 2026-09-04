@@ -32,21 +32,10 @@
     html{background:#ffffff}
     body{background:#ffffff;color:#1a1a2e;overflow-x:hidden;-webkit-font-smoothing:antialiased;font-family:'Inter',system-ui,sans-serif}
     app-root{display:block;min-height:100vh}
-    /* CSS-only boot spinner that auto-fades via animation - can never get stuck */
-    .boot{position:fixed;inset:0;z-index:99999;background:#ffffff;display:flex;align-items:center;justify-content:center;animation:boot-out .5s ease .65s forwards}
-    .boot-orbit{position:relative;width:72px;height:72px}
-    .boot-orbit::before{content:'';position:absolute;inset:0;border-radius:50%;border:1.5px solid #e6e8f0;border-top-color:#6366f1;animation:boot-spin .7s linear infinite}
-    .boot-orbit span{position:absolute;width:12px;height:12px;border-radius:50%;background:#6366f1;top:4px;left:calc(50% - 6px);animation:boot-spin .7s linear infinite}
-    .boot-word{position:absolute;top:calc(50% - 10px);left:calc(50% - 34px);width:68px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.22em;color:#6366f1;font-weight:500}
-    @keyframes boot-spin{to{transform:rotate(360deg)}}
-    @keyframes boot-out{to{opacity:0;pointer-events:none;visibility:hidden}}
   </style>
 </head>
 <body>
   <app-root>
-    <div class="boot">
-      <div class="boot-orbit"><span></span><div class="boot-word">BOOT</div></div>
-    </div>
   </app-root>
 </body>
 </html>

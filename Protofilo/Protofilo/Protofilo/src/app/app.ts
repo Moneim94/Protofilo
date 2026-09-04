@@ -55,7 +55,7 @@ export class App implements AfterViewInit, OnDestroy {
 
   counters = [
     { value: 7, suffix: '+', label: 'Years', sub: 'Enterprise-grade experience' },
-    { value: 5, suffix: '', label: 'Systems', sub: 'Major platforms architected' },
+    { value: 18, suffix: '', label: 'Systems', sub: 'Major platforms architected' },
     { value: 6, suffix: '', label: 'Domains', sub: 'Healthcare, security, finance & more' },
     { value: 8, suffix: '+', label: 'Stack', sub: 'Technologies mastered' }
   ];
