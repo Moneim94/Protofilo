@@ -1,241 +1,399 @@
-<!-- ============ SITE ============ -->
+<!-- ================= FUTURISTIC BOOT SPINNER (auto-fades in ~1s, can never get stuck) ================= -->
+<div class="spinner" aria-hidden="true">
+  <div class="spinner-stage">
+    <div class="orbit orbit-a"><span class="sat"></span></div>
+    <div class="orbit orbit-b"><span class="sat"></span></div>
+    <div class="orbit orbit-c"><span class="sat"></span></div>
+    <div class="core">M</div>
+  </div>
+</div>
+
+<!-- ================= SITE ================= -->
 <div class="site">
 
-  <!-- ============ NAVIGATION ============ -->
-  <nav class="nav" [class.scrolled]="scrolled" [class.menu-open]="menuOpen">
+  <!-- NAV -->
+  <header class="nav" [class.is-scrolled]="scrolled">
     <div class="nav-inner">
-      <a class="nav-brand" (click)="goTo('hero')">MONEIM</a>
-      <div class="nav-links">
-        @for (s of sections; track s.id) {
-          <a class="nav-link" [class.active]="currentSection === s.id" (click)="goTo(s.id)">{{ s.label }}</a>
+      <a class="nav-brand" (click)="goTo('home')">MONEIM<span class="brand-dot">.</span></a>
+      <nav class="nav-links">
+        @for (item of navItems; track item.id) {
+          <a class="nav-link" [class.active]="activeSection === item.id" (click)="goTo(item.id)">{{ item.label }}</a>
         }
+      </nav>
+      <div class="nav-right">
+        <a class="nav-cta" (click)="goTo('contact')"><span>Hire Me</span></a>
+        <button class="nav-burger" [class.open]="menuOpen" (click)="menuOpen = !menuOpen" [attr.aria-label]="menuOpen ? 'Close menu' : 'Open menu'" aria-expanded="menuOpen">
+          <span></span><span></span><span></span>
+        </button>
       </div>
-      <button class="nav-hamburger" (click)="menuOpen = !menuOpen" [attr.aria-label]="menuOpen ? 'Close menu' : 'Open menu'">
-        <span class="hamburger-line" [class.open]="menuOpen"></span>
-        <span class="hamburger-line" [class.open]="menuOpen"></span>
-      </button>
     </div>
-    <div class="nav-mobile">
-      @for (s of sections; track s.id) {
-        <a class="nav-mobile-link" [class.active]="currentSection === s.id" (click)="goTo(s.id)">{{ s.label }}</a>
+    <div class="nav-mobile" [class.open]="menuOpen">
+      @for (item of navItems; track item.id) {
+        <a class="nav-mobile-link" [class.active]="activeSection === item.id" (click)="goTo(item.id)">{{ item.label }}</a>
       }
     </div>
-  </nav>
+  </header>
 
-  <!-- ============ HERO ============ -->
-  <section id="hero" class="hero">
+  <!-- HERO -->
+  <section id="home" class="hero">
+    <div class="hero-bg" aria-hidden="true">
+      <div class="bg-grid"></div>
+      <div class="bg-glow glow-a"></div>
+      <div class="bg-glow glow-b"></div>
+      <div class="bg-line line-1"></div>
+      <div class="bg-line line-2"></div>
+      <div class="bg-particles">
+        @for (p of [0,1,2,3,4,5,6,7,8,9]; track p) {
+          <span class="particle" [class]="'p' + p"></span>
+        }
+      </div>
+    </div>
+
     <div class="hero-inner">
-      <div class="hero-content">
-        <div class="hero-badge reveal">Principal Software Engineer</div>
-        <h1 class="hero-title reveal">
-          Building systems<br>
-          <span class="hero-accent">that scale.</span>
+      <div class="hero-copy">
+        <div class="hero-eyebrow anim-item"><span class="eyebrow-bar"></span>Principal Software Engineer & Solution Architect</div>
+        <h1 class="hero-name anim-item">
+          <span class="line"><span class="first">AHMED</span></span>
+          <span class="line"><span class="second">ABD EL <span class="grad">MONIEM</span></span></span>
         </h1>
-        <p class="hero-desc reveal">
-          Architecting secure, scalable digital solutions with .NET, Angular, Cloud, Identity and modern engineering practices.
+        <p class="hero-sub anim-item">
+          Principal Software Engineer and Senior Full Stack Developer with over 7 years of enterprise-grade experience architecting and delivering high-performance web applications and distributed business platforms.
         </p>
-        <div class="hero-actions reveal">
-          <a class="btn-primary" (click)="goTo('projects')">
-            <span>View Projects</span>
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10m0 0l4-4m-4 4l-4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </a>
-          <a class="btn-outline" href="Ahmed_Abd_ElMoniem_Resume.pdf" download>Download Resume</a>
+        <div class="hero-badges anim-item">
+          <span class="float-badge" [class]="'fb-' + b" *ngFor="let b of heroBadges" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path [attr.d]="icons[b]"/></svg>
+          </span>
         </div>
-      </div>
-      <div class="hero-portrait reveal">
-        <div class="portrait-wrapper">
-          <img src="logo.png" alt="Ahmed Moneim — Principal Software Engineer" loading="eager">
-          <div class="portrait-ring"></div>
+        <div class="hero-skill-line anim-item">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14 M13 6l6 6-6 6"/></svg>
+          <span>Major expertise across</span>
         </div>
-      </div>
-    </div>
-    <div class="hero-scroll-indicator" (click)="goTo('about')">
-      <span class="mono">SCROLL</span>
-      <div class="scroll-line"></div>
-    </div>
-  </section>
-
-  <!-- ============ ABOUT ============ -->
-  <section id="about" class="section section-alt">
-    <div class="container">
-      <span class="section-label mono reveal">About</span>
-      <div class="about-grid">
-        <div class="about-text reveal">
-          <h2 class="section-title">Engineering at the<br><span class="text-accent">intersection of depth</span><br>and craftsmanship.</h2>
-          <p class="about-body">
-            I'm a Principal Software Engineer with 8+ years of experience architecting enterprise systems that operate across healthcare, security, and infrastructure domains. My work spans the full stack — from designing distributed service architectures to building polished frontends.
-          </p>
-          <p class="about-body">
-            I believe in systems that are not just functional, but maintainable, secure, and elegant. Every architecture decision is a commitment to the teams that will build on it and the users who will depend on it.
-          </p>
-        </div>
-        <div class="about-stats reveal">
-          <div class="stat-card">
-            <span class="stat-number">8+</span>
-            <span class="stat-label">Years in<br>Systems Engineering</span>
-          </div>
-          <div class="stat-card">
-            <span class="stat-number">4</span>
-            <span class="stat-label">Major Systems<br>Architected</span>
-          </div>
-          <div class="stat-card">
-            <span class="stat-number">6</span>
-            <span class="stat-label">Core<br>Domains</span>
-          </div>
-          <div class="stat-card">
-            <span class="stat-number">2</span>
-            <span class="stat-label">Regions<br>Operating In</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ SKILLS ============ -->
-  <section id="skills" class="section">
-    <div class="container">
-      <span class="section-label mono reveal">Expertise</span>
-      <h2 class="section-title reveal">Skills & <span class="text-accent">Engineering</span></h2>
-      <div class="skills-grid">
-        @for (cat of skillCategories; track cat.title) {
-          <div class="skill-category reveal">
-            <div class="skill-cat-header">
-              <span class="skill-cat-icon">{{ cat.icon }}</span>
-              <h3 class="skill-cat-title">{{ cat.title }}</h3>
-            </div>
-            <p class="skill-cat-desc">{{ cat.desc }}</p>
-            <div class="skill-tags">
-              @for (t of cat.techs; track t) {
-                <span class="skill-tag mono">{{ t }}</span>
-              }
-            </div>
-          </div>
-        }
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ EXPERIENCE ============ -->
-  <section id="experience" class="section section-alt">
-    <div class="container">
-      <span class="section-label mono reveal">Career</span>
-      <h2 class="section-title reveal">Professional <span class="text-accent">Journey</span></h2>
-      <div class="timeline">
-        @for (j of journey; track j.period; let i = $index) {
-          <div class="tl-item reveal" [class.current]="j.current">
-            <div class="tl-marker">
-              <div class="tl-dot"></div>
-              @if (i < journey.length - 1) { <div class="tl-line-seg"></div> }
-            </div>
-            <div class="tl-card">
-              <div class="tl-header">
-                <span class="tl-period mono">{{ j.period }}</span>
-                <span class="tl-org mono" [class.current-org]="j.current">{{ j.org }}</span>
-              </div>
-              <h3 class="tl-role">{{ j.role }}</h3>
-              <p class="tl-detail mono">{{ j.place }} · {{ j.focus }}</p>
-            </div>
-          </div>
-        }
-      </div>
-      <div class="edu-section reveal">
-        <h3 class="edu-heading">Education</h3>
-        <div class="edu-grid">
-          @for (e of education; track e.title) {
-            <div class="edu-card">
-              <span class="edu-year mono">{{ e.year }}</span>
-              <h4 class="edu-title">{{ e.title }}</h4>
-              <span class="edu-org mono">{{ e.org }}</span>
-            </div>
+        <div class="hero-skills anim-item">
+          @for (s of heroSkills; track s) {
+            <span class="hs-chip">{{ s }}</span>
           }
         </div>
+        <div class="hero-actions anim-item">
+          <a class="btn btn-primary" (click)="goTo('projects')">
+            <span>Explore Projects</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14 M13 6l6 6-6 6"/></svg>
+          </a>
+          <a class="btn btn-ghost" href="Ahmed_Abd_ElMoniem_Resume.pdf" download target="_blank" rel="noopener">Download CV</a>
+        </div>
+      </div>
+
+      <div class="hero-visual anim-item">
+        <div class="portrait-frame">
+          <div class="portrait-ring ring-1"></div>
+          <div class="portrait-ring ring-2"></div>
+          <img src="logo.png" alt="Ahmed Abd El Moniem — Principal Software Engineer & Solution Architect" loading="eager">
+          <div class="portrait-badge badge-loc"><span class="pulse"></span>Riyadh, KSA</div>
+          <div class="portrait-badge badge-role mono">PRINCIPAL · ARCHITECT</div>
+        </div>
+      </div>
+    </div>
+
+    <a class="hero-scroll" (click)="goTo('about')">
+      <span class="scroll-label mono">SCROLL</span>
+      <span class="scroll-track"><span class="scroll-thumb"></span></span>
+    </a>
+  </section>
+
+  <!-- ================= ABOUT ================= -->
+  <section id="about" class="section section-alt">
+    <div class="container">
+      <div class="section-head" data-reveal>
+        <span class="section-label mono">01 · About</span>
+        <h2 class="section-title">Enterprise engineer & <span class="grad-text">solution architect</span></h2>
+        <p class="section-lede">Deep full-stack engineering with an architect's eye for the systems that run the business.</p>
+      </div>
+
+      <div class="about-grid">
+        <div class="about-text" data-reveal>
+          <p>
+            I'm a <strong>Principal Software Engineer and Solution Architect</strong> with over 7 years of enterprise-grade experience designing and delivering high-performance web applications and distributed business platforms.
+          </p>
+          <p>
+            My work spans the entire stack — distributed systems, clean and domain-driven architecture, enterprise .NET, modern Angular frontends, and identity & security at scale. I've architected systems across healthcare, security, collaboration, and infrastructure domains.
+          </p>
+          <p>
+            Beyond code, I care about technical leadership: architectural governance, code quality, root-cause analysis, and mentoring the engineers who will carry these systems forward.
+          </p>
+        </div>
+        <div class="about-counters" data-reveal>
+          <div class="counter-card" *ngFor="let c of counters; let i=index" [style.--i]="i">
+            <span class="counter-num">
+              <span class="count" [attr.data-count]="c.value">{{ c.value }}</span>{{ c.suffix }}
+            </span>
+            <span class="counter-label">{{ c.label }}</span>
+            <span class="counter-sub">{{ c.sub }}</span>
+          </div>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- ============ PROJECTS ============ -->
-  <section id="projects" class="section">
+  <!-- ================= EXPERTISE ================= -->
+  <section id="expertise" class="section">
     <div class="container">
-      <span class="section-label mono reveal">Portfolio</span>
-      <h2 class="section-title reveal">Systems I've <span class="text-accent">Built</span></h2>
-      <div class="projects-grid">
-        @for (p of projects; track p.title; let i = $index) {
-          <article class="project-card reveal" (click)="toggleProject(i)">
-            <div class="project-header">
-              <span class="project-index mono">{{ p.index }}</span>
-              <span class="project-domain mono" [style.color]="p.color">{{ p.domain }}</span>
+      <div class="section-head" data-reveal>
+        <span class="section-label mono">02 · Core Expertise</span>
+        <h2 class="section-title">Technical <span class="grad-text">expertise</span></h2>
+        <p class="section-lede">A disciplined foundation across architecture, engineering, security, and data.</p>
+      </div>
+      <div class="expertise-grid">
+        @for (cat of expertise; track cat.title) {
+          <article class="ex-card" data-reveal [style.--cat]="cat.color">
+            <div class="ex-header">
+              <span class="ex-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path [attr.d]="icons[cat.icon]"/></svg>
+              </span>
+              <h3 class="ex-title">{{ cat.title }}</h3>
             </div>
-            <h3 class="project-title">{{ p.title }}</h3>
-            <p class="project-subtitle mono">{{ p.subtitle }}</p>
-            <div class="project-expand" [class.visible]="openProject === i">
-              <p class="project-desc">{{ p.desc }}</p>
-              <div class="project-tech">
-                @for (t of p.tech; track t) {
-                  <span class="project-tag mono">{{ t }}</span>
-                }
-              </div>
-              <div class="project-arch mono">{{ p.arch }}</div>
+            <p class="ex-desc">{{ cat.desc }}</p>
+            <div class="ex-techs">
+              @for (t of cat.techs; track t) {
+                <span class="ex-tag mono"><i></i>{{ t }}</span>
+              }
             </div>
-            <span class="project-toggle mono">{{ openProject === i ? 'Collapse' : 'Details' }} →</span>
           </article>
         }
       </div>
     </div>
   </section>
 
-  <!-- ============ ARCHITECTURE ============ -->
-  <section id="architecture" class="section section-alt">
+  <!-- ================= EXPERIENCE ================= -->
+  <section id="experience" class="section section-alt">
     <div class="container">
-      <span class="section-label mono reveal">Engineering</span>
-      <h2 class="section-title reveal">The Engineering <span class="text-accent">Dimension</span></h2>
-      <div class="arch-diagram reveal">
-        <div class="arch-nodes">
-          @for (n of engNodes; track n.id) {
-            <div class="arch-node" [class.active]="activeEng === n.id" [style.--x]="n.x + '%'" [style.--y]="n.y + '%'" (mouseenter)="activeEng = n.id" (mouseleave)="activeEng = null">
-              <div class="arch-node-dot"></div>
-              <span class="arch-node-label mono">{{ n.label }}</span>
+      <div class="section-head" data-reveal>
+        <span class="section-label mono">03 · Career</span>
+        <h2 class="section-title">Professional <span class="grad-text">experience</span></h2>
+        <p class="section-lede">Enterprise delivery and architectural leadership across KSA and Egypt.</p>
+      </div>
+      <div class="timeline">
+        @for (job of experience; track job.role; let i = $index) {
+          <div class="tl-item" data-reveal [class.current]="job.current">
+            <div class="tl-rail">
+              <div class="tl-node" [style.--node]="job.color"><span></span></div>
+              @if (i < experience.length - 1) { <div class="tl-seg"></div> }
             </div>
-          }
-          <svg class="arch-lines" viewBox="0 0 100 100" preserveAspectRatio="none">
-            @for (n of engNodes; track n.id; let i = $index) {
-              @for (n2 of engNodes; track n2.id; let j = $index) {
-                @if (j > i) {
-                  <line [attr.x1]="n.x" [attr.y1]="n.y" [attr.x2]="n2.x" [attr.y2]="n2.y" class="arch-line" [class.active]="activeEng === n.id || activeEng === n2.id"/>
+            <div class="tl-card">
+              <div class="tl-top">
+                <div class="tl-role-wrap">
+                  <span class="tl-role" [style.color]="job.color">{{ job.role }}</span>
+                  <span class="tl-org">{{ job.org }}</span>
+                </div>
+                <span class="tl-date mono">{{ job.range }}</span>
+              </div>
+              <span class="tl-place mono">{{ job.place }}</span>
+              <p class="tl-summary">{{ job.summary }}</p>
+              @if (job.current) { <span class="tl-current mono">● Present</span> }
+              <ul class="tl-points">
+                @for (pt of job.points; track pt) {
+                  <li><span class="li-dot" [style.background]="job.color"></span>{{ pt }}</li>
                 }
-              }
-            }
-          </svg>
-        </div>
-        <div class="arch-flow mono" [class.visible]="activeEng">{{ getEngFlow() }}</div>
+              </ul>
+              <div class="tl-tags">
+                @for (t of job.tags; track t) {
+                  <span class="tl-tag mono">{{ t }}</span>
+                }
+              </div>
+            </div>
+          </div>
+        }
       </div>
     </div>
   </section>
 
-  <!-- ============ CONTACT ============ -->
-  <section id="contact" class="section">
-    <div class="container contact-container">
-      <span class="section-label mono reveal">Contact</span>
-      <h2 class="section-title reveal">Let's build something<br><span class="text-accent">extraordinary.</span></h2>
-      <div class="contact-cards reveal">
-        <a class="contact-card cc-primary" href="mailto:ahmedmoneim094@gmail.com">
-          <span class="cc-label mono">EMAIL</span>
-          <span class="cc-value">ahmedmoneim094@gmail.com</span>
-          <span class="cc-arrow">→</span>
-        </a>
-        <a class="contact-card" href="tel:+966503100847">
-          <span class="cc-label mono">PHONE</span>
-          <span class="cc-value">+966 50 310 0847</span>
-        </a>
-        <div class="contact-card">
-          <span class="cc-label mono">BASE</span>
-          <span class="cc-value">Riyadh, Saudi Arabia</span>
-        </div>
+  <!-- ================= PROJECTS ================= -->
+  <section id="projects" class="section">
+    <div class="container">
+      <div class="section-head" data-reveal>
+        <span class="section-label mono">04 · Portfolio</span>
+        <h2 class="section-title">Selected <span class="grad-text">projects</span></h2>
+        <p class="section-lede">Enterprise systems architected and delivered across critical domains.</p>
       </div>
-      <footer class="footer reveal">
-        <span class="footer-brand mono">AHMED MONEIM</span>
-        <span class="footer-copy mono">© 2026</span>
-      </footer>
+      <div class="projects-grid">
+        @for (p of projects; track p.title; let i = $index) {
+          <article class="project-card" data-reveal [class.open]="activeProject === i" [style.--pc]="p.color" (click)="toggleProject(i)">
+            <div class="pc-top">
+              <span class="pc-index mono">{{ p.index }}</span>
+              <span class="pc-domain mono" [style.color]="p.color">{{ p.domain }}</span>
+            </div>
+            <h3 class="pc-title">{{ p.title }}</h3>
+            <p class="pc-sub mono">{{ p.subtitle }}</p>
+            <p class="pc-blurb">{{ p.blurb }}</p>
+            <div class="pc-expand" [class.open]="activeProject === i">
+              <div class="pc-desc">{{ p.desc }}</div>
+              <div class="pc-flow mono" [style.color]="p.color">{{ p.flow }}</div>
+              <div class="pc-techs">
+                @for (t of p.tech; track t) {
+                  <span class="pc-tag mono">{{ t }}</span>
+                }
+              </div>
+            </div>
+            <span class="pc-toggle mono">{{ activeProject === i ? 'Collapse' : 'View case' }} <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14 M6 13l6-6 6 6" [attr.d]="activeProject === i ? 'M12 19V5 M6 11l6 6 6-6' : 'M12 5v14 M6 13l6-6 6 6'"/></svg></span>
+          </article>
+        }
+      </div>
     </div>
   </section>
+
+  <!-- ================= ARCHITECTURE ================= -->
+  <section id="architecture" class="section section-alt">
+    <div class="container">
+      <div class="section-head" data-reveal>
+        <span class="section-label mono">05 · Architecture</span>
+        <h2 class="section-title">Architecture & <span class="grad-text">engineering</span></h2>
+        <p class="section-lede">A living view of how enterprise systems are composed — from client to data.</p>
+      </div>
+      <div class="arch-wrap" data-reveal>
+        <div class="arch-stage" (mouseleave)="activeArch = null">
+          <div class="arch-lines-svg">
+            <svg viewBox="0 0 100 100" preserveAspectRatio="none">
+              @for (n of archNodes; track n.id; let i = $index) {
+                @for (n2 of archNodes; track n2.id; let j = $index) {
+                  @if (j > i) {
+                    <line [attr.x1]="n.x" [attr.y1]="n.y" [attr.x2]="n2.x" [attr.y2]="n2.y" class="arch-line" [class.lit]="activeArch === n.id || activeArch === n2.id"/>
+                  }
+                }
+              }
+            </svg>
+          </div>
+          <div class="arch-node" *ngFor="let n of archNodes; let i=index"
+            [style.--nx]="n.x + '%'" [style.--ny]="n.y + '%'" [style.--delay]="i + 's'"
+            [class.active]="activeArch === n.id"
+            (mouseenter)="activeArch = n.id">
+            <span class="an-dot"></span>
+            <span class="an-label mono">{{ n.label }}</span>
+            <div class="an-tip">
+              <span class="an-tip-title">{{ n.label }}</span>
+              <span class="an-tip-detail">{{ n.detail }}</span>
+              <span class="an-tip-tech mono">{{ n.tech }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="arch-legend mono">
+          <span>Layered + Distributed System Layering</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= SECURITY & IDENTITY ================= -->
+  <section id="security" class="section">
+    <div class="container">
+      <div class="section-head" data-reveal>
+        <span class="section-label mono">06 · Security & Identity</span>
+        <h2 class="section-title">Identity & <span class="grad-text">security</span></h2>
+        <p class="section-lede">Authentication and authorization designed as enterprise infrastructure.</p>
+      </div>
+      <div class="sec-cards" data-reveal>
+        @for (step of securitySteps; track step.id; let i = $index) {
+          <div class="sec-card" [class.active]="activeSec === step.id" (mouseenter)="activeSec = step.id" (mouseleave)="activeSec = null">
+            <span class="sec-step mono">{{ (i+1).toString().padStart(2,'0') }}</span>
+            <span class="sec-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path [attr.d]="icons[step.icon]"/></svg>
+            </span>
+            <span class="sec-label">{{ step.label }}</span>
+            @if (i < securitySteps.length - 1) { <span class="sec-arrow">→</span> }
+          </div>
+        }
+      </div>
+      <div class="sec-panel" [class.show]="activeSec">
+        <span class="mono">Authorization flow · OAuth 2.0 / OpenID Connect / PKCE / RBAC</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= STRENGTHS ================= -->
+  <section id="strengths" class="section section-alt">
+    <div class="container">
+      <div class="section-head" data-reveal>
+        <span class="section-label mono">07 · Strengths</span>
+        <h2 class="section-title">Engineering <span class="grad-text">strengths</span></h2>
+        <p class="section-lede">How I approach architecture, delivery, and leadership.</p>
+      </div>
+      <div class="strength-grid">
+        @for (s of strengths; track s.title) {
+          <div class="strength-card" data-reveal>
+            <span class="st-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path [attr.d]="icons[s.icon]"/></svg>
+            </span>
+            <h3 class="st-title">{{ s.title }}</h3>
+            <p class="st-desc">{{ s.desc }}</p>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= EDUCATION ================= -->
+  <section id="education" class="section">
+    <div class="container">
+      <div class="section-head" data-reveal>
+        <span class="section-label mono">08 · Education</span>
+        <h2 class="section-title">Education & <span class="grad-text">training</span></h2>
+      </div>
+      <div class="edu-grid">
+        @for (e of education; track e.school) {
+          <div class="edu-card" data-reveal [style.--sk]="e.color">
+            <span class="edu-year mono">{{ e.year }}</span>
+            <h3 class="edu-school">{{ e.school }}</h3>
+            <span class="edu-degree mono">{{ e.degree }}</span>
+            <p class="edu-detail">{{ e.detail }}</p>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= CONTACT ================= -->
+  <section id="contact" class="section">
+    <div class="container">
+      <div class="contact-wrap" data-reveal>
+        <div class="contact-head">
+          <span class="section-label mono">09 · Contact</span>
+          <h2 class="section-title">Let's build something <span class="grad-text">extraordinary.</span></h2>
+          <p class="section-lede">Open to senior engineering, architecture, and leadership opportunities.</p>
+        </div>
+        <div class="contact-cards">
+          <a class="c-card" href="mailto:ahmedmoneim094@gmail.com">
+            <span class="c-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7l8 6 8-6"/><rect x="3" y="5" width="18" height="14" rx="2"/></svg>
+            </span>
+            <span class="c-label mono">EMAIL</span>
+            <span class="c-value">ahmedmoneim094@gmail.com</span>
+            <span class="c-tag mono">Open</span>
+          </a>
+          <a class="c-card" href="tel:+966503100847">
+            <span class="c-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3l3 4 1-1c2-1 5 2 6 6l-1 1 4 3-2 5c-10 1-16-4-15-15z"/></svg>
+            </span>
+            <span class="c-label mono">PHONE</span>
+            <span class="c-value">+966 50 310 0847</span>
+            <span class="c-tag mono">Direct</span>
+          </a>
+          <div class="c-card">
+            <span class="c-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-5.5-7-11a7 7 0 0 1 14 0c0 5.5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+            </span>
+            <span class="c-label mono">BASE</span>
+            <span class="c-value">Riyadh, Saudi Arabia</span>
+            <span class="c-tag mono">Remote ready</span>
+          </div>
+        </div>
+        <button class="copy-btn" (click)="copyEmail()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 9h11v11H9z M5 15H4V4h11v1"/></svg>
+          <span>{{ copied ? 'Copied!' : 'Copy email address' }}</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <span class="mono">AHMED ABD EL MONIEM</span>
+    <span class="mono">© 2026 · Principal Software Engineer & Solution Architect</span>
+  </footer>
 
 </div>

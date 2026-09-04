@@ -14,10 +14,11 @@ describe('App', () => {
     expect(app).toBeTruthy();
   });
 
-  it('should render the site', () => {
+  it('should render the site with hero', () => {
     const fixture = TestBed.createComponent(App);
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelector('.site')).toBeTruthy();
+    expect(compiled.querySelector('.hero-name')?.textContent).toContain('AHMED');
   });
 });
