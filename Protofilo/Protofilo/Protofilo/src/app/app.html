@@ -23,7 +23,6 @@
         }
       </nav>
       <div class="nav-right">
-        <a class="nav-cta" (click)="goTo('contact')"><span>Hire Me</span></a>
         <button class="nav-burger" [class.open]="menuOpen" (click)="menuOpen = !menuOpen" [attr.aria-label]="menuOpen ? 'Close menu' : 'Open menu'" aria-expanded="menuOpen">
           <span></span><span></span><span></span>
         </button>
@@ -59,7 +58,7 @@
           <span class="line"><span class="second">ABD EL <span class="grad">MONIEM</span></span></span>
         </h1>
         <p class="hero-sub anim-item">
-          Principal Software Engineer and Senior Full Stack Developer with over 7 years of enterprise-grade experience architecting and delivering high-performance web applications and distributed business platforms.
+          Principal Software Engineer with over 7 years of enterprise-grade experience architecting and delivering high-performance web applications and distributed business platforms.
         </p>
         <div class="hero-badges anim-item">
           <span class="float-badge" [class]="'fb-' + b" *ngFor="let b of heroBadges" aria-hidden="true">
