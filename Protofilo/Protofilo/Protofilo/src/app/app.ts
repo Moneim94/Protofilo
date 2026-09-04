@@ -67,10 +67,8 @@ export class App implements OnInit, OnDestroy, AfterViewInit {
   ngOnInit() {}
 
   ngAfterViewInit() {
-    setTimeout(() => {
-      this.initScroll();
-      this.initObserver();
-    }, 1050);
+    this.initScroll();
+    this.initObserver();
   }
 
   ngOnDestroy() {
@@ -102,10 +100,15 @@ export class App implements OnInit, OnDestroy, AfterViewInit {
       entries.forEach(en => {
         if (en.isIntersecting) {
           en.target.classList.add('revealed');
+          this.observer.unobserve(en.target);
         }
       });
     }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
-    document.querySelectorAll('.reveal').forEach(el => this.observer.observe(el));
+    const els = document.querySelectorAll('.reveal');
+    els.forEach(el => {
+      el.classList.add('pre-hidden');
+      this.observer.observe(el);
+    });
   }
 
   goTo(id: string) {

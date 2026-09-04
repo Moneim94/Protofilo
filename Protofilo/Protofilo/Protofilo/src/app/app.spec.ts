@@ -14,10 +14,10 @@ describe('App', () => {
     expect(app).toBeTruthy();
   });
 
-  it('should render the loader', () => {
+  it('should render the site', () => {
     const fixture = TestBed.createComponent(App);
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('.loader')).toBeTruthy();
+    expect(compiled.querySelector('.site')).toBeTruthy();
   });
 });
