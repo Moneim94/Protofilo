@@ -1,35 +1,30 @@
-<!-- ============ MONEIM PERSONAL BRAND LOADER (removed from DOM ~1.1s; can never block the site) ============ -->
+<!-- ============ MONEIM BRAND INTRO (pure CSS ~0.95s, removed from DOM via @if) ============ -->
 @if (!booted) {
-  <div class="brand-load" aria-hidden="true">
-    <div class="load-grid"></div>
-    <div class="load-stage">
-      <div class="load-glow"></div>
-      <svg class="load-circuit" width="0" height="0" viewBox="0 0 360 360" aria-hidden="true">
-        <g class="circ-group">
-          <path class="circ-path" d="M180 40 L288 72 L318 180 L288 288 L180 320 L72 288 L42 180 L72 72 Z"></path>
-          <circle class="circ-node n1" cx="180" cy="40" r="3"></circle>
-          <circle class="circ-node n2" cx="288" cy="72" r="3"></circle>
-          <circle class="circ-node n3" cx="318" cy="180" r="3"></circle>
-          <circle class="circ-node n4" cx="288" cy="288" r="3"></circle>
-          <circle class="circ-node n5" cx="180" cy="320" r="3"></circle>
-          <circle class="circ-node n6" cx="72" cy="288" r="3"></circle>
-          <circle class="circ-node n7" cx="42" cy="180" r="3"></circle>
-          <circle class="circ-node n8" cx="72" cy="72" r="3"></circle>
-        </g>
+  <div class="intro" aria-hidden="true">
+    <div class="intro-stage">
+      <div class="intro-point"></div>
+
+      <svg class="intro-geom" viewBox="0 0 420 150" fill="none" aria-hidden="true">
+        <path class="br br-tl" d="M16 42 V20 Q16 14 22 14 H60"></path>
+        <path class="br br-tr" d="M404 42 V20 Q404 14 398 14 H360"></path>
+        <path class="br br-bl" d="M16 108 V130 Q16 136 22 136 H60"></path>
+        <path class="br br-br" d="M404 108 V130 Q404 136 398 136 H360"></path>
+        <circle class="nd nd-t" cx="210" cy="14" r="2.2"></circle>
+        <circle class="nd nd-b" cx="210" cy="136" r="2.2"></circle>
+        <path class="br br-mid" d="M210 14 L210 42"></path>
+        <path class="br br-mid" d="M210 108 L210 136"></path>
       </svg>
-      <div class="load-orbit">
-        <span class="sat s1"></span>
-        <span class="sat s2"></span>
-        <span class="sat s3"></span>
-      </div>
-      <div class="load-ring ring-outer"></div>
-      <div class="load-ring ring-inner"></div>
-      <div class="load-word">
+
+      <div class="intro-word">
+        <span class="intro-sweep"></span>
         <span class="l">M</span><span class="l">O</span><span class="l">N</span><span class="l">E</span><span class="l">I</span><span class="l">M</span>
       </div>
-      <div class="load-tag mono">PRINCIPAL SOFTWARE ENGINEER</div>
+
+      <div class="intro-line">
+        <span class="tick tk-l"></span>
+        <span class="tick tk-r"></span>
+      </div>
     </div>
-    <span class="particle p1"></span><span class="particle p2"></span><span class="particle p3"></span><span class="particle p4"></span><span class="particle p5"></span><span class="particle p6"></span>
   </div>
 }
 
