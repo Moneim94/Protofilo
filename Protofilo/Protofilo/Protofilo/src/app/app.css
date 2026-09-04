@@ -18,12 +18,14 @@
 }
 .spinner-stage { position: relative; width: 132px; height: 132px; }
 .spinner-stage .core {
-  position: absolute; inset: 50%; width: 44px; height: 44px;
+  position: absolute; left: 50%; top: 50%;
+  width: 92px; height: 34px; padding: 0 14px;
   transform: translate(-50%,-50%);
-  border-radius: 50%;
+  border-radius: 17px;
   display: flex; align-items: center; justify-content: center;
+  white-space: nowrap;
   background: var(--accent-grad); color: #fff;
-  font-family: var(--font-display); font-weight: 700; font-size: 1.15rem;
+  font-family: var(--font-display); font-weight: 700; font-size: .95rem; letter-spacing: .05em;
   box-shadow: 0 0 0 6px var(--accent-surface), 0 8px 24px rgba(79,70,229,.35);
 }
 .orbit { position: absolute; border: 1.5px solid var(--border-strong); border-radius: 50%; }
