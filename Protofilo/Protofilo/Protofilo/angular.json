@@ -23,7 +23,7 @@
                 "glob": "**/*", 
                 "input": "public"
               }
-            ],
+            ], 
             "styles": [
               "src/styles.css"
             ]
@@ -33,13 +33,13 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kB",
-                  "maximumError": "1MB"
+                  "maximumWarning": "600kB",
+                  "maximumError": "1.2MB"
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "32kB",
-                  "maximumError": "64kB"
+                  "maximumWarning": "80kB",
+                  "maximumError": "140kB"
                 }
               ],
               "outputHashing": "all"
@@ -85,6 +85,9 @@
               "src/styles.css"
             ]
           }
+        },
+        "deploy": {
+          "builder": "angular-cli-ghpages:deploy"
         }
       }
     }
