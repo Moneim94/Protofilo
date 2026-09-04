@@ -1,26 +1,40 @@
-<!-- ============ MONEIM BRAND INTRO (pure CSS ~0.95s, removed from DOM via @if) ============ -->
+<!-- ============ MONEIM CIRCULAR IDENTITY LOADER (SVG + CSS, ~1s, removed from DOM via @if) ============ -->
 @if (!booted) {
-  <div class="intro" aria-hidden="true">
-    <div class="intro-stage">
-      <div class="intro-point"></div>
+  <div class="loading" aria-hidden="true">
+    <div class="circle">
+      <div class="c-glow"></div>
 
-      <svg class="intro-geom" viewBox="0 0 400 400" fill="none" aria-hidden="true">
-        <circle class="g-ring" cx="200" cy="200" r="168"></circle>
-        <circle class="g-ring g-ring-2" cx="200" cy="200" r="192"></circle>
-        <circle class="nd nd-a" cx="200" cy="32" r="2.4"></circle>
-        <circle class="nd nd-b" cx="200" cy="368" r="2.4"></circle>
-        <circle class="nd nd-c" cx="32" cy="200" r="2.4"></circle>
-        <circle class="nd nd-d" cx="368" cy="200" r="2.4"></circle>
+      <div class="c-orbit orbit-b"><span class="orb-dot d-b"></span></div>
+      <div class="c-orbit orbit-a"><span class="orb-dot d-a"></span></div>
+
+      <svg class="c-svg" viewBox="0 0 400 400" fill="none" aria-hidden="true">
+        <defs>
+          <linearGradient id="lc-grad" x1="0" y1="0" x2="400" y2="400" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#2563EB"/>
+            <stop offset="0.5" stop-color="#06B6D4"/>
+            <stop offset="1" stop-color="#7C3AED"/>
+          </linearGradient>
+          <linearGradient id="lc-grad-soft" x1="0" y1="0" x2="400" y2="400" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#38BDF8" stop-opacity="0.14"/>
+            <stop offset="1" stop-color="#7C3AED" stop-opacity="0.06"/>
+          </linearGradient>
+        </defs>
+        <circle class="ring ring-out" cx="200" cy="200" r="194" stroke="url(#lc-grad-soft)"/>
+        <circle class="ring ring-mid" cx="200" cy="200" r="180" stroke="rgba(37,99,235,0.10)"/>
+        <circle class="ring ring-dash" cx="200" cy="200" r="158" stroke="rgba(124,58,237,0.16)"/>
+        <g class="arc-head-g">
+          <circle class="arc arc-head" cx="200" cy="200" r="180" stroke="url(#lc-grad)"/>
+        </g>
+        <g class="arc-trail-g">
+          <circle class="arc arc-trail" cx="200" cy="200" r="180" stroke="url(#lc-grad)"/>
+        </g>
       </svg>
 
-      <div class="intro-word">
-        <span class="intro-sweep"></span>
-        <span class="l">M</span><span class="l">O</span><span class="l">N</span><span class="l">E</span><span class="l">I</span><span class="l">M</span>
-      </div>
-
-      <div class="intro-line">
-        <span class="tick tk-l"></span>
-        <span class="tick tk-r"></span>
+      <div class="c-inner">
+        <div class="c-word">
+          <span class="ll">M</span><span class="ll">O</span><span class="ll">N</span><span class="ll">E</span><span class="ll">I</span><span class="ll">M</span>
+        </div>
+        <div class="c-sub mono">PRINCIPAL SOFTWARE ENGINEER</div>
       </div>
     </div>
   </div>
