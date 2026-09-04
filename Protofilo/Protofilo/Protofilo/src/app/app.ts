@@ -8,8 +8,6 @@ import { CommonModule } from '@angular/common';
   styleUrl: './app.css'
 })
 export class App implements OnInit, OnDestroy, AfterViewInit {
-  loaderDone = false;
-  siteVisible = false;
   menuOpen = false;
   scrolled = false;
   currentSection = 'hero';
@@ -70,15 +68,9 @@ export class App implements OnInit, OnDestroy, AfterViewInit {
 
   ngAfterViewInit() {
     setTimeout(() => {
-      this.loaderDone = true;
-      this.cdr.detectChanges();
-      setTimeout(() => {
-        this.siteVisible = true;
-        this.cdr.detectChanges();
-        this.initScroll();
-        this.initObserver();
-      }, 50);
-    }, 1000);
+      this.initScroll();
+      this.initObserver();
+    }, 1050);
   }
 
   ngOnDestroy() {
