@@ -1,13 +1,9 @@
 import { Component, OnInit, OnDestroy, AfterViewInit, HostListener, ViewChild, ElementRef, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-/* ==================== INTERFACES ==================== */
-
 interface AmbientDot { x: number; y: number; vx: number; vy: number; r: number; a: number; hue: number; pulse: number; }
 interface MetricParticle { x: number; y: number; vx: number; vy: number; r: number; a: number; pulse: number; }
 interface IntroGeo { verts: { x: number; y: number; z: number }[]; edges: [number, number][]; rx: number; ry: number; rz: number; sx: number; sy: number; sz: number; dist: number; scale: number; }
-
-/* ==================== COMPONENT ==================== */
 
 @Component({
   selector: 'app-root',
@@ -90,7 +86,6 @@ export class App implements OnInit, OnDestroy, AfterViewInit {
     { title: 'B.S. Computer Science', org: 'Minia University', year: '2013 — 2018' }
   ];
 
-  /* ==================== CANVAS ==================== */
   private ambientCanvas!: HTMLCanvasElement;
   private actx!: CanvasRenderingContext2D;
   private heroCanvas!: HTMLCanvasElement;
@@ -102,7 +97,6 @@ export class App implements OnInit, OnDestroy, AfterViewInit {
   private scrollHandler: any;
   private observer!: IntersectionObserver;
 
-  /* ==================== INTRO SYSTEM ==================== */
   private introCanvas!: HTMLCanvasElement;
   private ictx!: CanvasRenderingContext2D;
   private introStartTime = 0;
@@ -111,29 +105,23 @@ export class App implements OnInit, OnDestroy, AfterViewInit {
   private isMobile = false;
   private fontsReady = false;
   private imageReady = false;
-  private minimumTimeReached = false;
 
-  private introTextSample = '';
   private letterTargets: { x: number; y: number }[] = [];
 
-  private pMain: { sx: number; sy: number; x: number; y: number; tx: number; ty: number; r: number; a: number; ma: number; col: number; delay: number }[] = [];
-  private pTrail: { x: number; y: number; a: number }[] = [];
+  private pMain: { sx: number; sy: number; x: number; y: number; vx: number; vy: number; tx: number; ty: number; r: number; a: number; ma: number; col: number; delay: number }[] = [];
   private pFg: { x: number; y: number; vx: number; vy: number; r: number; a: number; pulse: number; col: number }[] = [];
   private pOrbit: { angle: number; radius: number; speed: number; r: number; a: number; incl: number }[] = [];
   private rings: { radius: number; speed: number; rot: number; lw: number }[] = [];
   private geos: IntroGeo[] = [];
 
   private collapseStart = 0;
-  private collapseFlash = 0;
-  private collapseDone = false;
-  private readonly INTRO_MIN = 3.0;
-  private readonly INTRO_MAX = 6.5;
-  private readonly COLLAPSE_DUR = 1.6;
+  private readonly COLLAPSE_DUR = 1.8;
+  private readonly INTRO_MIN = 2.5;
+  private readonly INTRO_MAX = 6.0;
+  private minimumTimeReached = false;
 
-  /* ==================== HERO ==================== */
   private heroParticles: { x: number; y: number; vx: number; vy: number; r: number; a: number; pulse: number }[] = [];
 
-  /* ==================== METRICS ==================== */
   private metricsCanvas!: HTMLCanvasElement;
   private mctx!: CanvasRenderingContext2D;
   private metricsVisible = false;
@@ -144,8 +132,6 @@ export class App implements OnInit, OnDestroy, AfterViewInit {
   private metricsMouseY = 0;
   private metricsAnim = [0, 0, 0, 0];
   private metricsRevealed = false;
-
-  /* ==================== LIFECYCLE ==================== */
 
   constructor(private ngZone: NgZone) {}
 
@@ -171,8 +157,6 @@ export class App implements OnInit, OnDestroy, AfterViewInit {
     if (this.scrollHandler) window.removeEventListener('scroll', this.scrollHandler);
     if (this.observer) this.observer.disconnect();
   }
-
-  /* ==================== MOUSE ==================== */
 
   @HostListener('document:mousemove', ['$event'])
   onMouse(e: MouseEvent) {
@@ -249,29 +233,31 @@ export class App implements OnInit, OnDestroy, AfterViewInit {
     ctx.fillText('MONEIM', w / 2, h / 2);
     const data = ctx.getImageData(0, 0, w, h).data;
     this.letterTargets = [];
-    const step = Math.max(2, Math.floor(fs / 30));
+    const step = 2;
     for (let y = 0; y < h; y += step) for (let x = 0; x < w; x += step) {
       if (data[(y * w + x) * 4 + 3] > 128) this.letterTargets.push({ x, y });
     }
-    this.introTextSample = `${w}x${h}@${Math.round(fs)}`;
   }
 
   private spawnIntroMain() {
     const w = this.introCanvas.width; const h = this.introCanvas.height;
     const cx = w / 2; const cy = h / 2;
-    const count = this.isMobile ? 300 : 600;
-    this.pMain = Array.from({ length: count }, () => {
+    const count = this.isMobile ? 500 : 1200;
+    this.pMain = Array.from({ length: count }, (_, i) => {
       const a = Math.random() * Math.PI * 2;
       const d = 250 + Math.random() * Math.max(w, h) * 0.65;
       const cr = Math.random();
+      const angleVariance = (Math.random() - 0.5) * 0.3;
       return {
         sx: cx + Math.cos(a) * d, sy: cy + Math.sin(a) * d,
-        x: cx + Math.cos(a) * d, y: cy + Math.sin(a) * d,
+        x: cx + Math.cos(a) * (d + 100), y: cy + Math.sin(a) * (d + 100),
+        vx: Math.cos(a + angleVariance) * (0.3 + Math.random() * 0.4),
+        vy: Math.sin(a + angleVariance) * (0.3 + Math.random() * 0.4),
         tx: 0, ty: 0,
-        r: Math.random() * 1.8 + 0.3,
-        a: 0, ma: 0.25 + Math.random() * 0.75,
+        r: Math.random() * 1.5 + 0.4,
+        a: 0, ma: 0.3 + Math.random() * 0.7,
         col: cr < 0.45 ? 0 : cr < 0.78 ? 1 : 2,
-        delay: Math.random() * 0.7
+        delay: Math.random() * 0.8
       };
     });
     this.reassignTargets();
@@ -281,14 +267,14 @@ export class App implements OnInit, OnDestroy, AfterViewInit {
     if (!this.letterTargets.length) return;
     for (let i = 0; i < this.pMain.length; i++) {
       const t = this.letterTargets[i % this.letterTargets.length];
-      this.pMain[i].tx = t.x + (Math.random() - 0.5) * 2;
-      this.pMain[i].ty = t.y + (Math.random() - 0.5) * 2;
+      this.pMain[i].tx = t.x + (Math.random() - 0.5) * 1.5;
+      this.pMain[i].ty = t.y + (Math.random() - 0.5) * 1.5;
     }
   }
 
   private spawnIntroForeground() {
     const w = this.introCanvas.width; const h = this.introCanvas.height;
-    const count = this.isMobile ? 25 : 60;
+    const count = this.isMobile ? 40 : 80;
     this.pFg = Array.from({ length: count }, () => ({
       x: Math.random() * w, y: Math.random() * h,
       vx: (Math.random() - 0.5) * 0.35, vy: (Math.random() - 0.5) * 0.25,
@@ -298,7 +284,7 @@ export class App implements OnInit, OnDestroy, AfterViewInit {
   }
 
   private spawnIntroOrbits() {
-    const count = this.isMobile ? 30 : 60;
+    const count = this.isMobile ? 40 : 80;
     this.pOrbit = Array.from({ length: count }, () => ({
       angle: Math.random() * Math.PI * 2,
       radius: 100 + Math.random() * 160,
@@ -351,10 +337,9 @@ export class App implements OnInit, OnDestroy, AfterViewInit {
     if (this.introFullyDone) return;
     this.introDone = true;
     this.introFullyDone = true;
-    setTimeout(() => { this.worldVisible = true; setTimeout(() => this.onIntroComplete(), 300); }, 350);
+    this.worldVisible = true;
+    this.onIntroComplete();
   }
-
-  /* ==================== INTRO RENDER ==================== */
 
   private renderIntro(): boolean {
     if (this.introFullyDone) return false;
@@ -367,7 +352,6 @@ export class App implements OnInit, OnDestroy, AfterViewInit {
     if (!this.minimumTimeReached && elapsed >= this.INTRO_MIN) { this.minimumTimeReached = true; this.checkIntroReady(); }
     if (elapsed >= this.INTRO_MAX && !this.introTransitioning) this.finishIntro();
 
-    /* ===== COLLAPSE PHASE ===== */
     if (this.introTransitioning) {
       const ct = (now - this.collapseStart) / 1000;
       if (ct >= this.COLLAPSE_DUR + 0.5) {
@@ -377,56 +361,42 @@ export class App implements OnInit, OnDestroy, AfterViewInit {
       return this.renderCollapse(ctx, w, h, cx, cy, ct);
     }
 
-    /* ===== NORMAL PHASES ===== */
+    const P1_END = 1.4;
+    const P2_START = 1.0;
+    const P2_END = 3.2;
+    const P3_START = 2.6;
+    const P3_LIFE = 3.8;
 
-    /* Fade: 0.6s at end */
-    const fadeStart = this.INTRO_MAX - 1.0;
-    let masterAlpha = 1;
-    if (elapsed > fadeStart) masterAlpha = Math.max(0, 1 - (elapsed - fadeStart) / 1.0);
-
-    /* Phase boundaries */
-    const P1_END = 1.4;     /* Emergence end */
-    const P2_START = 1.0;   /* Convergence overlap */
-    const P2_END = 3.0;     /* Convergence end */
-    const P3_START = 2.6;   /* Text reveal start */
-    const P3_LIFE = 3.8;    /* Letter life start */
-
-    /* Clear */
     ctx.globalAlpha = 1;
     ctx.fillStyle = '#030409';
     ctx.fillRect(0, 0, w, h);
-    ctx.globalAlpha = masterAlpha;
 
-    /* ---- Background atmosphere ---- */
     const breath = 0.5 + 0.5 * Math.sin(elapsed * 0.7);
     const atmGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.min(w, h) * 0.45);
-    atmGrad.addColorStop(0, `rgba(196,154,108,${0.035 * breath})`);
-    atmGrad.addColorStop(0.5, `rgba(122,168,204,${0.012 * breath})`);
+    atmGrad.addColorStop(0, `rgba(196,154,108,${0.04 * breath})`);
+    atmGrad.addColorStop(0.5, `rgba(122,168,204,${0.015 * breath})`);
     atmGrad.addColorStop(1, 'rgba(3,4,9,0)');
     ctx.fillStyle = atmGrad;
     ctx.fillRect(0, 0, w, h);
 
-    /* ---- Orbital rings ---- */
     if (elapsed > 0.3) {
       const ra = Math.min(0.9, (elapsed - 0.3) * 0.5);
       for (const r of this.rings) {
         r.rot += r.speed * 0.016;
-        const alpha = ra * (0.045 + 0.025 * Math.sin(elapsed * 0.9 + r.radius * 0.01));
+        const alpha = ra * (0.05 + 0.03 * Math.sin(elapsed * 0.9 + r.radius * 0.01));
         ctx.save(); ctx.translate(cx, cy); ctx.rotate(r.rot);
         ctx.beginPath(); ctx.ellipse(0, 0, r.radius, r.radius * 0.32, 0, 0, Math.PI * 2);
         ctx.strokeStyle = `rgba(122,168,204,${alpha})`; ctx.lineWidth = r.lw; ctx.stroke();
-        /* orbital dot */
         const da = elapsed * r.speed * 2;
         const ox = Math.cos(da) * r.radius, oy = Math.sin(da) * r.radius * 0.32;
-        ctx.beginPath(); ctx.arc(ox, oy, 1.8, 0, Math.PI * 2);
+        ctx.beginPath(); ctx.arc(ox, oy, 2, 0, Math.PI * 2);
         ctx.fillStyle = `rgba(196,154,108,${alpha * 3.5})`; ctx.fill();
         ctx.restore();
       }
     }
 
-    /* ---- Geometric wireframes ---- */
     if (elapsed > 0.5) {
-      const ga = Math.min(0.1, (elapsed - 0.5) * 0.05);
+      const ga = Math.min(0.12, (elapsed - 0.5) * 0.06);
       for (const g of this.geos) {
         g.rx += g.sx; g.ry += g.sy; g.rz += g.sz;
         const oa = elapsed * 0.18 + g.dist * 0.012;
@@ -454,128 +424,152 @@ export class App implements OnInit, OnDestroy, AfterViewInit {
       }
     }
 
-    /* ---- Main particles ---- */
+    const cols = [[196, 154, 108], [122, 168, 204], [210, 210, 220]];
+
     for (const p of this.pMain) {
       if (elapsed < P1_END) {
-        /* EMERGENCE: drift */
-        const fade = Math.min(1, elapsed * 0.8);
-        p.x += Math.sin(elapsed * 0.4 + p.sx * 0.008) * 0.18;
-        p.y += Math.cos(elapsed * 0.35 + p.sy * 0.008) * 0.14;
-        p.a = Math.min(p.ma * 0.35, elapsed * 0.28);
+        p.x += p.vx * 0.5;
+        p.y += p.vy * 0.5;
+        p.a = Math.min(p.ma * 0.4, elapsed * 0.3);
       } else if (elapsed < P2_END) {
-        /* CONVERGENCE: spring to targets */
         const cp = Math.min(1, (elapsed - P2_START) / (P2_END - P2_START));
-        const ease = cp < 0.5 ? 2 * cp * cp : 1 - Math.pow(-2 * cp + 2, 2) / 2;
-        p.x += (p.tx - p.x) * ease * 0.055;
-        p.y += (p.ty - p.y) * ease * 0.055;
-        p.a = Math.min(p.ma, 0.2 + cp * 0.8);
+        const ease = cp < 0.5 ? 4 * cp * cp * cp : 1 - Math.pow(-2 * cp + 2, 3) / 2;
+        const springK = 0.04 + ease * 0.08;
+        const dx = p.tx - p.x; const dy = p.ty - p.y;
+        p.vx += dx * springK; p.vy += dy * springK;
+        p.vx *= 0.92; p.vy *= 0.92;
+        p.x += p.vx; p.y += p.vy;
+        p.a = Math.min(p.ma, 0.15 + cp * 0.85);
       } else {
-        /* HELD in position with breathing */
-        p.x = p.tx + Math.sin(elapsed * 1.3 + p.tx * 0.015) * 0.3;
-        p.y = p.ty + Math.cos(elapsed * 1.05 + p.ty * 0.015) * 0.22;
+        const mouseDx = this.mouseX - p.tx;
+        const mouseDy = this.mouseY - p.ty;
+        const mouseDist = Math.sqrt(mouseDx * mouseDx + mouseDy * mouseDy);
+        const mousePush = mouseDist < 120 ? (120 - mouseDist) / 120 * 8 : 0;
+        const pushAngle = Math.atan2(p.ty - this.mouseY, p.tx - this.mouseX);
+        const breathX = Math.sin(elapsed * 1.3 + p.tx * 0.015) * 0.35;
+        const breathY = Math.cos(elapsed * 1.05 + p.ty * 0.015) * 0.25;
+        p.x = p.tx + breathX + Math.cos(pushAngle) * mousePush;
+        p.y = p.ty + breathY + Math.sin(pushAngle) * mousePush;
         p.a = p.ma * (0.75 + 0.25 * Math.sin(elapsed * 1.8 + p.tx * 0.008));
       }
       if (p.a > 0.008) {
-        const cols = [[196,154,108],[122,168,204],[210,210,220]];
         const c = cols[p.col];
         ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
         ctx.fillStyle = `rgba(${c[0]},${c[1]},${c[2]},${p.a})`; ctx.fill();
       }
     }
 
-    /* ---- Foreground ambient particles ---- */
     for (const p of this.pFg) {
       p.x += p.vx; p.y += p.vy; p.pulse += 0.007;
       if (p.x < -10) p.x = w + 10; if (p.x > w + 10) p.x = -10;
       if (p.y < -10) p.y = h + 10; if (p.y > h + 10) p.y = -10;
-      if (elapsed > 0.3) p.a = Math.min(p.a + 0.003, 0.1 + 0.08 * Math.sin(p.pulse));
-      const cols2 = [[196,154,108],[122,168,204]];
-      const cc = cols2[p.col];
+      if (elapsed > 0.3) p.a = Math.min(p.a + 0.003, 0.12 + 0.08 * Math.sin(p.pulse));
+      const cc = cols[p.col];
       ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(${cc[0]},${cc[1]},${cc[2]},${p.a})`; ctx.fill();
     }
 
-    /* ---- Energy waves ---- */
     if (elapsed > P2_START + 0.3) {
-      for (let i = 0; i < 4; i++) {
-        const wt = elapsed - P2_START - 0.3 - i * 0.5;
+      for (let i = 0; i < 5; i++) {
+        const wt = elapsed - P2_START - 0.3 - i * 0.45;
         if (wt > 0 && wt < 2.5) {
           const wp = wt / 2.5;
           const radius = 25 + wp * Math.max(w, h) * 0.55;
           ctx.beginPath(); ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-          ctx.strokeStyle = `rgba(196,154,108,${0.065 * (1 - wp)})`;
-          ctx.lineWidth = 0.9; ctx.stroke();
+          ctx.strokeStyle = `rgba(196,154,108,${0.08 * (1 - wp)})`;
+          ctx.lineWidth = 1; ctx.stroke();
         }
       }
     }
 
-    /* ---- "MONEIM" text ---- */
+    if (elapsed > P2_START) {
+      const sa = Math.min(0.06, (elapsed - P2_START) * 0.015);
+      const beamCount = this.isMobile ? 4 : 8;
+      for (let i = 0; i < beamCount; i++) {
+        const a = (i / beamCount) * Math.PI * 2 + elapsed * 0.2;
+        const len = 80 + Math.sin(elapsed * 2.2 + i * 1.5) * 40;
+        const r1 = 45; const r2 = r1 + len;
+        const sx = cx + Math.cos(a) * r1, sy = cy + Math.sin(a) * r1 * 0.32;
+        const ex = cx + Math.cos(a) * r2, ey = cy + Math.sin(a) * r2 * 0.32;
+        const lg = ctx.createLinearGradient(sx, sy, ex, ey);
+        lg.addColorStop(0, `rgba(196,154,108,${sa})`);
+        lg.addColorStop(0.5, `rgba(255,230,200,${sa * 0.6})`);
+        lg.addColorStop(1, 'rgba(196,154,108,0)');
+        ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(ex, ey);
+        ctx.strokeStyle = lg; ctx.lineWidth = 0.8; ctx.stroke();
+      }
+    }
+
     if (elapsed > P3_START) {
       const tp = Math.min(1, (elapsed - P3_START) / 0.7);
       const te = 1 - Math.pow(1 - tp, 5);
       const fs = Math.min(w * 0.135, 135);
       const txtFont = `600 ${fs}px 'Outfit', 'Space Grotesk', sans-serif`;
 
-      /* Glitch displacement */
       let gx = 0, gy = 0;
       const glitchTimes = [P3_START + 0.6, P3_START + 1.2, P3_START + 2.0, P3_LIFE + 0.8, P3_LIFE + 1.8];
       for (const gt of glitchTimes) {
         if (elapsed > gt && elapsed < gt + 0.06) { gx = (Math.random() - 0.5) * 10; gy = (Math.random() - 0.5) * 4; }
       }
 
-      /* Shadow depth */
       ctx.save();
-      ctx.shadowColor = `rgba(196,154,108,${0.35 * te})`;
-      ctx.shadowBlur = 55;
+      ctx.shadowColor = `rgba(196,154,108,${0.5 * te})`;
+      ctx.shadowBlur = 70;
       ctx.shadowOffsetX = 0; ctx.shadowOffsetY = 3;
-      ctx.fillStyle = `rgba(232,234,240,${te * 0.96})`;
+      ctx.fillStyle = `rgba(232,234,240,${te * 0.97})`;
       ctx.font = txtFont; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       ctx.fillText('MONEIM', cx + gx, cy + gy);
       ctx.restore();
 
-      /* Chromatic aberration */
+      ctx.save();
+      ctx.globalCompositeOperation = 'screen';
+      ctx.shadowColor = `rgba(196,154,108,${0.25 * te})`;
+      ctx.shadowBlur = 120;
+      ctx.fillStyle = `rgba(196,154,108,${0.08 * te})`;
+      ctx.font = txtFont; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText('MONEIM', cx, cy);
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.restore();
+
       if (Math.abs(gx) > 1.5) {
         ctx.save(); ctx.globalCompositeOperation = 'screen';
         ctx.font = txtFont; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        ctx.fillStyle = `rgba(196,154,108,0.18)`;
+        ctx.fillStyle = `rgba(196,154,108,0.2)`;
         ctx.fillText('MONEIM', cx + gx * 2.2, cy + gy * 0.8);
-        ctx.fillStyle = `rgba(122,168,204,0.12)`;
+        ctx.fillStyle = `rgba(122,168,204,0.14)`;
         ctx.fillText('MONEIM', cx - gx * 1.7, cy - gy * 0.6);
         ctx.globalCompositeOperation = 'source-over'; ctx.restore();
       }
 
-      /* Scanline sweep */
       if (elapsed > P3_START + 0.15 && elapsed < P3_START + 3) {
         const sp = (elapsed - P3_START - 0.15) / 2.85;
         const scanX = cx - fs * 3 + sp * fs * 6;
-        const sg = ctx.createLinearGradient(scanX - 2, 0, scanX + 2, 0);
+        const sg = ctx.createLinearGradient(scanX - 3, 0, scanX + 3, 0);
         sg.addColorStop(0, 'rgba(196,154,108,0)');
-        sg.addColorStop(0.5, `rgba(196,154,108,${0.07 * te})`);
+        sg.addColorStop(0.5, `rgba(196,154,108,${0.09 * te})`);
         sg.addColorStop(1, 'rgba(196,154,108,0)');
-        ctx.fillStyle = sg; ctx.fillRect(scanX - 2, cy - fs * 0.4, 4, fs * 0.8);
+        ctx.fillStyle = sg; ctx.fillRect(scanX - 3, cy - fs * 0.45, 6, fs * 0.9);
       }
 
-      /* Letter breathing distortion */
       if (elapsed > P3_LIFE) {
         const breathAmt = Math.min(1, (elapsed - P3_LIFE) * 0.5);
-        const bScale = 1 + breathAmt * 0.004 * Math.sin(elapsed * 1.2);
-        const bSkew = breathAmt * 0.002 * Math.sin(elapsed * 0.9 + 1);
+        const bScale = 1 + breathAmt * 0.005 * Math.sin(elapsed * 1.2);
+        const bSkew = breathAmt * 0.003 * Math.sin(elapsed * 0.9 + 1);
         ctx.save();
         ctx.translate(cx, cy); ctx.scale(bScale, 1 + bSkew); ctx.translate(-cx, -cy);
         ctx.clearRect(cx - fs * 3, cy - fs * 0.45, fs * 6, fs * 0.9);
         ctx.fillStyle = '#030409';
         ctx.fillRect(cx - fs * 3, cy - fs * 0.45, fs * 6, fs * 0.9);
-        ctx.shadowColor = `rgba(196,154,108,${0.3 * te})`;
-        ctx.shadowBlur = 50;
-        ctx.fillStyle = `rgba(232,234,240,${te * 0.96})`;
+        ctx.shadowColor = `rgba(196,154,108,${0.4 * te})`;
+        ctx.shadowBlur = 60;
+        ctx.fillStyle = `rgba(232,234,240,${te * 0.97})`;
         ctx.font = txtFont; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
         ctx.fillText('MONEIM', cx, cy);
         ctx.restore();
       }
 
-      /* Subtitle */
-      if (elapsed > P3_LIFE + 0.2) {
-        const subA = Math.min(0.5, (elapsed - P3_LIFE - 0.2) * 0.35);
+      if (elapsed > P3_LIFE + 0.15) {
+        const subA = Math.min(0.55, (elapsed - P3_LIFE - 0.15) * 0.4);
         ctx.fillStyle = `rgba(138,144,160,${subA})`;
         ctx.font = `300 ${Math.min(w * 0.015, 10)}px 'JetBrains Mono', monospace`;
         ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
@@ -583,9 +577,8 @@ export class App implements OnInit, OnDestroy, AfterViewInit {
       }
     }
 
-    /* ---- Corner brackets ---- */
     if (elapsed > 1.0) {
-      const ba = Math.min(0.08, (elapsed - 1.0) * 0.04);
+      const ba = Math.min(0.1, (elapsed - 1.0) * 0.05);
       const bs = Math.min(w, h) * 0.065;
       ctx.strokeStyle = `rgba(196,154,108,${ba})`; ctx.lineWidth = 0.8;
       const corners = [
@@ -600,31 +593,11 @@ export class App implements OnInit, OnDestroy, AfterViewInit {
       });
     }
 
-    /* ---- Light streaks ---- */
-    if (elapsed > P2_START) {
-      const sa = Math.min(0.04, (elapsed - P2_START) * 0.01);
-      const count = this.isMobile ? 3 : 5;
-      for (let i = 0; i < count; i++) {
-        const a = (i / count) * Math.PI * 2 + elapsed * 0.25;
-        const len = 70 + Math.sin(elapsed * 1.8 + i * 1.2) * 35;
-        const r1 = 55; const r2 = r1 + len;
-        const sx = cx + Math.cos(a) * r1, sy = cy + Math.sin(a) * r1 * 0.32;
-        const ex = cx + Math.cos(a) * r2, ey = cy + Math.sin(a) * r2 * 0.32;
-        const lg = ctx.createLinearGradient(sx, sy, ex, ey);
-        lg.addColorStop(0, `rgba(196,154,108,${sa})`);
-        lg.addColorStop(1, 'rgba(196,154,108,0)');
-        ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(ex, ey);
-        ctx.strokeStyle = lg; ctx.lineWidth = 0.5; ctx.stroke();
-      }
-    }
-
-    /* ---- Vignette ---- */
     const vig = ctx.createRadialGradient(cx, cy, Math.min(w, h) * 0.22, cx, cy, Math.min(w, h) * 0.72);
     vig.addColorStop(0, 'rgba(3,4,9,0)');
     vig.addColorStop(1, 'rgba(3,4,9,0.55)');
     ctx.fillStyle = vig; ctx.fillRect(0, 0, w, h);
 
-    /* ---- Scanlines overlay ---- */
     if (elapsed > 1.5) {
       const slA = Math.min(0.025, (elapsed - 1.5) * 0.008);
       ctx.fillStyle = `rgba(0,0,0,${slA})`;
@@ -635,19 +608,17 @@ export class App implements OnInit, OnDestroy, AfterViewInit {
     return true;
   }
 
-  /* ---- COLLAPSE ---- */
-
   private renderCollapse(ctx: CanvasRenderingContext2D, w: number, h: number, cx: number, cy: number, ct: number): boolean {
     const progress = Math.min(1, ct / this.COLLAPSE_DUR);
-    const spiralAccel = progress * progress;
-    const spiralAngle = spiralAccel * Math.PI * 4;
+    const spiralAccel = progress * progress * progress;
+    const spiralAngle = spiralAccel * Math.PI * 6;
 
-    /* Background darken */
     ctx.fillStyle = '#030409';
     ctx.fillRect(0, 0, w, h);
 
-    /* Collapsing particles */
     const collapseR = Math.max(w, h) * 0.75 * (1 - progress);
+    const cols = [[196, 154, 108], [122, 168, 204], [210, 210, 220]];
+
     for (let i = 0; i < this.pMain.length; i++) {
       const p = this.pMain[i];
       const targetR = Math.sqrt((p.tx - cx) ** 2 + (p.ty - cy) ** 2);
@@ -656,63 +627,65 @@ export class App implements OnInit, OnDestroy, AfterViewInit {
       const cr = targetR * (1 - progress * 0.98);
       const px = cx + Math.cos(collapseAngle) * cr;
       const py = cy + Math.sin(collapseAngle) * cr;
-      const alpha = p.ma * (1 - progress * 0.6);
-      const size = p.r * (1 + progress * 1.5);
-      const cols = [[196,154,108],[122,168,204],[210,210,220]];
+      const alpha = p.ma * (1 - progress * 0.5);
+      const size = p.r * (1 + progress * 2);
       const c = cols[p.col];
 
-      /* Trail streak */
-      if (progress > 0.15) {
-        const trailLen = progress * 18;
+      if (progress > 0.1) {
+        const trailLen = progress * 25;
         const tx2 = px - Math.cos(collapseAngle) * trailLen;
         const ty2 = py - Math.sin(collapseAngle) * trailLen;
         const tg = ctx.createLinearGradient(tx2, ty2, px, py);
         tg.addColorStop(0, 'rgba(196,154,108,0)');
-        tg.addColorStop(1, `rgba(${c[0]},${c[1]},${c[2]},${alpha * 0.4})`);
+        tg.addColorStop(1, `rgba(${c[0]},${c[1]},${c[2]},${alpha * 0.5})`);
         ctx.beginPath(); ctx.moveTo(tx2, ty2); ctx.lineTo(px, py);
-        ctx.strokeStyle = tg; ctx.lineWidth = size * 0.6; ctx.stroke();
+        ctx.strokeStyle = tg; ctx.lineWidth = size * 0.7; ctx.stroke();
       }
 
       ctx.beginPath(); ctx.arc(px, py, size, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(${c[0]},${c[1]},${c[2]},${alpha})`; ctx.fill();
     }
 
-    /* Text scaling down + fading */
-    const txtAlpha = Math.max(0, 1 - progress * 1.4);
+    const txtAlpha = Math.max(0, 1 - progress * 1.3);
     if (txtAlpha > 0.01) {
-      const scale = 1 - progress * 0.3;
+      const scale = 1 - progress * 0.25;
       const fs = Math.min(w * 0.135, 135) * scale;
       ctx.save();
       ctx.translate(cx, cy); ctx.scale(scale, scale); ctx.translate(-cx, -cy);
-      ctx.shadowColor = `rgba(196,154,108,${0.3 * txtAlpha})`;
-      ctx.shadowBlur = 45 * (1 + progress);
-      ctx.fillStyle = `rgba(232,234,240,${txtAlpha * 0.96})`;
+      ctx.shadowColor = `rgba(196,154,108,${0.4 * txtAlpha})`;
+      ctx.shadowBlur = 50 * (1 + progress);
+      ctx.fillStyle = `rgba(232,234,240,${txtAlpha * 0.97})`;
       ctx.font = `600 ${fs}px 'Outfit', 'Space Grotesk', sans-serif`;
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       ctx.fillText('MONEIM', cx, cy);
       ctx.restore();
     }
 
-    /* Central flash */
-    if (progress > 0.6) {
-      const fp = (progress - 0.6) / 0.4;
-      const flash = fp < 0.5 ? fp * 2 : 2 - fp * 2;
-      const flashR = 5 + flash * 180;
+    if (progress > 0.55) {
+      const fp = (progress - 0.55) / 0.45;
+      const flash = fp < 0.4 ? fp * 2.5 : Math.max(0, 1.6 - fp * 1.6);
+      const flashR = 5 + flash * 220;
       const fg = ctx.createRadialGradient(cx, cy, 0, cx, cy, flashR);
-      fg.addColorStop(0, `rgba(255,255,255,${flash * 0.95})`);
-      fg.addColorStop(0.3, `rgba(196,154,108,${flash * 0.6})`);
+      fg.addColorStop(0, `rgba(255,255,255,${flash * 0.98})`);
+      fg.addColorStop(0.2, `rgba(196,154,108,${flash * 0.7})`);
+      fg.addColorStop(0.6, `rgba(122,168,204,${flash * 0.2})`);
       fg.addColorStop(1, 'rgba(196,154,108,0)');
       ctx.fillStyle = fg;
       ctx.fillRect(cx - flashR, cy - flashR, flashR * 2, flashR * 2);
 
-      /* Expanding ring */
-      ctx.beginPath();
-      ctx.arc(cx, cy, flashR * 0.8, 0, Math.PI * 2);
-      ctx.strokeStyle = `rgba(196,154,108,${flash * 0.4})`;
-      ctx.lineWidth = 1.5; ctx.stroke();
+      for (let r = 0; r < 3; r++) {
+        const ringProgress = Math.max(0, fp - r * 0.12);
+        if (ringProgress > 0 && ringProgress < 0.8) {
+          const ringR = ringProgress * Math.max(w, h) * 0.7;
+          const ringA = (1 - ringProgress / 0.8) * 0.3;
+          ctx.beginPath();
+          ctx.arc(cx, cy, ringR, 0, Math.PI * 2);
+          ctx.strokeStyle = `rgba(196,154,108,${ringA})`;
+          ctx.lineWidth = 1.5 - ringProgress; ctx.stroke();
+        }
+      }
     }
 
-    /* Final black wipe */
     if (ct > this.COLLAPSE_DUR) {
       const wipe = Math.min(1, (ct - this.COLLAPSE_DUR) / 0.5);
       ctx.fillStyle = `rgba(3,4,9,${wipe})`;
@@ -721,8 +694,6 @@ export class App implements OnInit, OnDestroy, AfterViewInit {
 
     return true;
   }
-
-  /* ==================== INTRO COMPLETE ==================== */
 
   private onIntroComplete() {
     this.scrollHandler = () => {
@@ -745,12 +716,8 @@ export class App implements OnInit, OnDestroy, AfterViewInit {
       });
     };
     window.addEventListener('scroll', this.scrollHandler, { passive: true });
-    setTimeout(() => this.scrollHandler(), 200);
+    setTimeout(() => this.scrollHandler(), 100);
   }
-
-  /* ====================================================================
-     AMBIENT FIELD
-     ==================================================================== */
 
   private initAmbient() {
     this.ambientCanvas = this.ambientRef.nativeElement;
@@ -796,10 +763,6 @@ export class App implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  /* ====================================================================
-     HERO CANVAS — atmospheric particles
-     ==================================================================== */
-
   private initHeroCanvas() {
     if (!this.heroRef) return;
     this.heroCanvas = this.heroRef.nativeElement;
@@ -835,10 +798,6 @@ export class App implements OnInit, OnDestroy, AfterViewInit {
       ctx.fillStyle = `rgba(196,154,108,${alpha})`; ctx.fill();
     }
   }
-
-  /* ====================================================================
-     ENGINEERING
-     ==================================================================== */
 
   private initEng() {
     if (!this.engRef) return;
@@ -876,10 +835,6 @@ export class App implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  /* ====================================================================
-     PORTALS
-     ==================================================================== */
-
   private renderPortals() {
     document.querySelectorAll('.proj-canvas').forEach((canvas) => {
       const c = canvas as HTMLCanvasElement;
@@ -899,10 +854,6 @@ export class App implements OnInit, OnDestroy, AfterViewInit {
       ctx.beginPath(); ctx.arc(cx, cy, 4, 0, Math.PI * 2); ctx.fillStyle = 'rgba(232,234,240,0.25)'; ctx.fill();
     });
   }
-
-  /* ====================================================================
-     METRICS CANVAS
-     ==================================================================== */
 
   private initMetrics() {
     if (!this.metricsCanvasRef) return;
@@ -1026,10 +977,6 @@ export class App implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  /* ====================================================================
-     NAV / SCROLL
-     ==================================================================== */
-
   toggleNav() { this.navOpen = !this.navOpen; }
   goTo(id: string) { const el = document.getElementById(id); if (el) el.scrollIntoView({ behavior: this.reducedMotion ? 'auto' : 'smooth' }); this.navOpen = false; }
   activateEng(id: string) { this.activeEng = id; }
@@ -1055,10 +1002,6 @@ export class App implements OnInit, OnDestroy, AfterViewInit {
       document.querySelectorAll('.impact-label').forEach(el => this.observer.observe(el));
     }, 500);
   }
-
-  /* ====================================================================
-     RENDER LOOP
-     ==================================================================== */
 
   private renderLoop() {
     this.renderIntro();
