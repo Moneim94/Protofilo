@@ -27,8 +27,8 @@ describe('App', () => {
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelector('.loading')).toBeTruthy();
-    expect(compiled.querySelector('.c-svg .arc-head-g')).toBeTruthy();
-    expect(compiled.querySelector('.c-word')?.textContent?.replace(/\s/g, '')).toBe('MONEIM');
+    expect(compiled.querySelector('.sn-scope .sn-beam')).toBeTruthy();
+    expect(compiled.querySelector('.sn-word')?.textContent?.replace(/\s/g, '')).toBe('MONEIM');
     const app = fixture.componentInstance;
     app.booted = true;
     fixture.detectChanges();

@@ -8,14 +8,14 @@
 .grad-text { background: var(--accent-grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; }
 
 /* ================================================================
-   MONEIM CIRCULAR IDENTITY LOADER
-   SVG + CSS. Layers:
-     - soft gradient outer ring + faint mid ring + dotted counter-ring
-     - rotating gradient comet arc (bright head + faint trailing tail)
-     - two orbiting particles (clockwise + counter-clockwise)
-     - breathing center glow
+   MONEIM SONAR LOADER
+   "Systems online" radar scope:
+     - radar grid: faint dashed ring + inner ring + crosshair axes
+     - rotating gradient scan beam (conic wedge sweep)
+     - two sonar pings radiating out of the core + dot blips
      - center: gradient MONEIM letters reveal + mono tagline
-   transform / opacity / stroke-dashoffset only. ~1.0s total.
+   transform / opacity only. Clean on small screens: everything
+   lives inside a vw-scaled circle, overflow masked.
    Removed from DOM at ~1.0s via Angular @if (booted).
    ================================================================ */
 .loading {
@@ -23,73 +23,68 @@
   background: linear-gradient(180deg, #ffffff 0%, #fafbff 55%, #f3f5fc 100%);
   display: flex; align-items: center; justify-content: center;
   overflow: hidden;
-  animation: loading-bg-exit .32s ease .72s forwards;
+  animation: loading-bg-exit .32s ease .7s forwards;
 }
-.circle {
+.sonar {
   position: relative;
   width: min(320px, 76vw);
   aspect-ratio: 1;
-  animation: circle-exit .3s cubic-bezier(.5,0,.6,1) .72s forwards;
-  font-size: 0;
+  animation: scope-exit .3s cubic-bezier(.5,0,.6,1) .7s forwards;
 }
-
-.c-glow {
-  position: absolute; inset: -16px; border-radius: 50%;
-  background: radial-gradient(circle, rgba(56,189,248,.16) 0%, rgba(124,58,237,.11) 44%, transparent 68%);
-  animation: glow-breathe 1.5s ease-in-out .2s infinite both;
+.sn-scope {
+  position: absolute; inset: 0; border-radius: 50%;
+  overflow: hidden;
 }
-
-.c-orbit { position: absolute; inset: 0; pointer-events: none; }
-.orbit-a { animation: spin-cw 1.4s linear infinite; }
-.orbit-b { animation: spin-ccw 1.15s linear infinite; }
-.orb-dot { position: absolute; border-radius: 50%; }
-.d-a {
-  top: 2px; left: calc(50% - 4.5px); width: 9px; height: 9px;
-  background: linear-gradient(135deg, #38BDF8, #7C3AED);
-  box-shadow: 0 0 14px rgba(56,189,248,.55), 0 0 4px rgba(124,58,237,.35);
-  animation: dot-pulse 1.4s ease-in-out infinite;
+.sn-ring { position: absolute; border-radius: 50%; pointer-events: none; }
+.r-1 { inset: 2%; border: 1.5px dashed rgba(37,99,235,.18); }
+.r-2 { inset: 19%; border: 1px solid rgba(37,99,235,.13); }
+.sn-ax { position: absolute; background: rgba(37,99,235,.10); pointer-events: none; }
+.ax-h { left: 0; right: 0; top: calc(50% - .5px); height: 1px; }
+.ax-v { top: 0; bottom: 0; left: calc(50% - .5px); width: 1px; }
+.sn-beam {
+  position: absolute; inset: 12%; border-radius: 50%; pointer-events: none;
+  background: conic-gradient(
+    from 0deg,
+    rgba(37,99,235,0) 0deg,
+    rgba(56,189,248,.34) 38deg,
+    rgba(124,58,237,.20) 62deg,
+    rgba(37,99,235,0) 86deg,
+    rgba(37,99,235,0) 360deg
+  );
+  -webkit-mask: radial-gradient(circle, transparent 62%, #000 62.5%, #000 100%);
+  mask: radial-gradient(circle, transparent 62%, #000 62.5%, #000 100%);
+  animation: spin-cw 1.8s linear infinite;
 }
-.d-b {
-  bottom: 27px; left: calc(50% - 3px); width: 6px; height: 6px;
-  background: linear-gradient(135deg, #2563EB, #06B6D4);
-  box-shadow: 0 0 12px rgba(6,182,212,.6);
+.sn-ping {
+  position: absolute; inset: 0; border-radius: 50%;
+  border: 2px solid rgba(37,99,235,.26);
+  animation: ping-expand 2.4s ease-out infinite;
 }
-
-.c-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
-.ring { fill: none; }
-.ring-out { stroke-width: 1.4; }
-.ring-mid { stroke-width: 1; stroke-dasharray: 1.5 7; }
-.ring-dash {
-  stroke-width: 1.6; stroke-linecap: round;
-  stroke-dasharray: 2 9;
-  animation: dash-run .8s linear infinite;
+.ping-late { animation-delay: 1.2s; }
+.sn-blip { position: absolute; width: 5px; height: 5px; border-radius: 50%; pointer-events: none; }
+.bl-1 {
+  top: 25%; left: 25%;
+  background: #06B6D4;
+  box-shadow: 0 0 10px rgba(6,182,212,.65);
+  animation: blip-ping 2.2s ease-out infinite, blip-fade 2.2s ease-out infinite;
 }
-.arc-head-g,
-.arc-trail-g { transform-origin: 200px 200px; }
-.arc-head-g { animation: spin-cw 1.05s linear infinite; }
-.arc-trail-g { animation: spin-beam 1.05s linear infinite; }
-.arc { fill: none; stroke-linecap: round; }
-.arc-trail {
-  stroke-width: 3; opacity: .22;
-  stroke-dasharray: 330 800.97;
+.bl-2 {
+  bottom: 28%; right: 26%;
+  background: #7C3AED;
+  box-shadow: 0 0 10px rgba(124,58,237,.6);
+  animation: blip-ping 2.2s ease-out 1.1s infinite, blip-fade 2.2s ease-out 1.1s infinite;
 }
-.arc-head {
-  stroke-width: 4;
-  stroke-dasharray: 122 1008.97;
-  filter: drop-shadow(0 0 6px rgba(56,189,248,.45));
-}
-
-.c-inner {
+.sn-core {
   position: absolute; inset: 0;
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
-  gap: 14px;
+  gap: 13px;
   pointer-events: none;
 }
-.c-word {
+.sn-word {
   display: flex; align-items: baseline;
   font-family: var(--font-display); font-weight: 700;
-  font-size: clamp(2.1rem, 7.4vw, 2.7rem);
+  font-size: clamp(2rem, 6.8vw, 2.6rem);
   letter-spacing: .16em; padding-right: .16em;
   line-height: 1;
   background: linear-gradient(120deg, #1e3a8a 0%, #2563eb 38%, #06b6d4 68%, #7c3aed 100%);
@@ -97,66 +92,62 @@
   -webkit-text-fill-color: transparent; color: transparent;
   white-space: nowrap;
 }
-.c-word .ll {
+.sn-word .ll {
   display: inline-block;
-  opacity: 0; transform: translateY(14px) scale(.92); filter: blur(5px);
-  animation: lrise .4s cubic-bezier(.16,.75,.24,1) forwards;
+  opacity: 0; transform: translateY(12px) scale(.94); filter: blur(4px);
+  animation: lrise .34s cubic-bezier(.16,.75,.24,1) forwards;
 }
-.c-word .ll:nth-child(1) { animation-delay: .14s; }
-.c-word .ll:nth-child(2) { animation-delay: .21s; }
-.c-word .ll:nth-child(3) { animation-delay: .28s; }
-.c-word .ll:nth-child(4) { animation-delay: .35s; }
-.c-word .ll:nth-child(5) { animation-delay: .42s; }
-.c-word .ll:nth-child(6) { animation-delay: .49s; }
-.c-sub {
-  font-size: .56rem; letter-spacing: .3em; text-indent: .3em;
+.sn-word .ll:nth-child(1) { animation-delay: .11s; }
+.sn-word .ll:nth-child(2) { animation-delay: .17s; }
+.sn-word .ll:nth-child(3) { animation-delay: .23s; }
+.sn-word .ll:nth-child(4) { animation-delay: .29s; }
+.sn-word .ll:nth-child(5) { animation-delay: .35s; }
+.sn-word .ll:nth-child(6) { animation-delay: .41s; }
+.sn-sub {
+  font-size: .55rem; letter-spacing: .3em; text-indent: .3em;
   color: #8b90ab; font-weight: 500;
   opacity: 0; transform: translateY(4px);
-  animation: sub-in .4s ease .62s forwards;
+  animation: sub-in .38s ease .52s forwards;
 }
 
 @keyframes spin-cw { to { transform: rotate(360deg); } }
-@keyframes spin-ccw { to { transform: rotate(-360deg); } }
-@keyframes spin-beam {
-  from { transform: rotate(-150deg); }
-  to   { transform: rotate(210deg); }
+@keyframes ping-expand {
+  0%   { transform: scale(.42); opacity: .85; }
+  100% { transform: scale(1); opacity: 0; }
 }
-@keyframes dash-run {
-  from { stroke-dashoffset: 0; }
-  to   { stroke-dashoffset: -220; }
+@keyframes blip-ping {
+  0%, 60% { transform: scale(.4); }
+  30% { transform: scale(1.35); }
 }
-@keyframes glow-breathe {
-  0%,100% { opacity: .6; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.06); }
-}
-@keyframes dot-pulse {
-  0%,100% { transform: scale(1); }
-  50% { transform: scale(1.28); }
+@keyframes blip-fade {
+  0%, 20% { opacity: 0; }
+  40% { opacity: 1; }
+  70% { opacity: 0; }
 }
 @keyframes lrise {
-  from { opacity: 0; transform: translateY(14px) scale(.92); filter: blur(5px); }
+  from { opacity: 0; transform: translateY(12px) scale(.94); filter: blur(4px); }
   to   { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
 }
 @keyframes sub-in { to { opacity: 1; transform: translateY(0); } }
-@keyframes circle-exit {
+@keyframes scope-exit {
   0% { transform: scale(1); opacity: 1; }
-  100% { transform: scale(.92); opacity: 0; }
+  100% { transform: scale(.9); opacity: 0; }
 }
 @keyframes loading-bg-exit { to { opacity: 0; } }
 
 @media (prefers-reduced-motion: reduce) {
   .loading { background: #ffffff; }
-  .c-word .ll { animation: none !important; opacity: 1 !important; transform: none !important; filter: none !important; }
-  .c-sub { animation: none !important; opacity: 1; transform: none; }
-  .arc-head-g, .arc-trail-g, .orbit-a, .orbit-b, .ring-dash, .c-glow,
-  .c-svg, .c-inner, .circle { animation-duration: .001s !important; animation-delay: .3s !important; opacity: 1; }
+  .sn-word .ll { animation: none !important; opacity: 1 !important; transform: none !important; filter: none !important; }
+  .sn-sub { animation: none !important; opacity: 1; transform: none; }
+  .sn-beam, .sn-ping, .sn-blip { animation: none !important; opacity: .5; }
   .loading { animation: loading-bg-exit .25s ease .42s forwards; }
 }
 
 @media (max-width: 560px) {
-  .circle { width: min(280px, 78vw); }
-  .c-word { font-size: clamp(1.9rem, 9vw, 2.3rem); letter-spacing: .12em; padding-right: .12em; }
-  .c-sub { letter-spacing: .24em; text-indent: .24em; gap: 10px; }
+  .sonar { width: min(280px, 80vw); }
+  .sn-word { font-size: clamp(1.75rem, 8.4vw, 2.2rem); letter-spacing: .12em; padding-right: .12em; }
+  .sn-sub { letter-spacing: .24em; text-indent: .24em; gap: 10px; }
+  .sn-beam { opacity: .8; }
 }
 
 .site { opacity: 1; }

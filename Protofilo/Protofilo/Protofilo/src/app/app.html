@@ -1,40 +1,23 @@
-<!-- ============ MONEIM CIRCULAR IDENTITY LOADER (SVG + CSS, ~1s, removed from DOM via @if) ============ -->
+<!-- ============ MONEIM SONAR LOADER (CSS, ~1s, removed from DOM via @if booted) ============ -->
 @if (!booted) {
   <div class="loading" aria-hidden="true">
-    <div class="circle">
-      <div class="c-glow"></div>
-
-      <div class="c-orbit orbit-b"><span class="orb-dot d-b"></span></div>
-      <div class="c-orbit orbit-a"><span class="orb-dot d-a"></span></div>
-
-      <svg class="c-svg" viewBox="0 0 400 400" fill="none" aria-hidden="true">
-        <defs>
-          <linearGradient id="lc-grad" x1="0" y1="0" x2="400" y2="400" gradientUnits="userSpaceOnUse">
-            <stop offset="0" stop-color="#2563EB"/>
-            <stop offset="0.5" stop-color="#06B6D4"/>
-            <stop offset="1" stop-color="#7C3AED"/>
-          </linearGradient>
-          <linearGradient id="lc-grad-soft" x1="0" y1="0" x2="400" y2="400" gradientUnits="userSpaceOnUse">
-            <stop offset="0" stop-color="#38BDF8" stop-opacity="0.14"/>
-            <stop offset="1" stop-color="#7C3AED" stop-opacity="0.06"/>
-          </linearGradient>
-        </defs>
-        <circle class="ring ring-out" cx="200" cy="200" r="194" stroke="url(#lc-grad-soft)"/>
-        <circle class="ring ring-mid" cx="200" cy="200" r="180" stroke="rgba(37,99,235,0.10)"/>
-        <circle class="ring ring-dash" cx="200" cy="200" r="158" stroke="rgba(124,58,237,0.16)"/>
-        <g class="arc-head-g">
-          <circle class="arc arc-head" cx="200" cy="200" r="180" stroke="url(#lc-grad)"/>
-        </g>
-        <g class="arc-trail-g">
-          <circle class="arc arc-trail" cx="200" cy="200" r="180" stroke="url(#lc-grad)"/>
-        </g>
-      </svg>
-
-      <div class="c-inner">
-        <div class="c-word">
-          <span class="ll">M</span><span class="ll">O</span><span class="ll">N</span><span class="ll">E</span><span class="ll">I</span><span class="ll">M</span>
+    <div class="sonar">
+      <div class="sn-scope">
+        <span class="sn-ring r-1"></span>
+        <span class="sn-ring r-2"></span>
+        <span class="sn-ax ax-h"></span>
+        <span class="sn-ax ax-v"></span>
+        <span class="sn-beam"></span>
+        <span class="sn-ping"></span>
+        <span class="sn-ping ping-late"></span>
+        <span class="sn-blip bl-1"></span>
+        <span class="sn-blip bl-2"></span>
+        <div class="sn-core">
+          <div class="sn-word">
+            <span class="ll">M</span><span class="ll">O</span><span class="ll">N</span><span class="ll">E</span><span class="ll">I</span><span class="ll">M</span>
+          </div>
+          <div class="sn-sub mono">PRINCIPAL SOFTWARE ENGINEER</div>
         </div>
-        <div class="c-sub mono">PRINCIPAL SOFTWARE ENGINEER</div>
       </div>
     </div>
   </div>
