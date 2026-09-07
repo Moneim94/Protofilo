@@ -277,7 +277,7 @@ export class App implements AfterViewInit, OnDestroy {
     this.initScroll();
     this.initObserver();
     const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
-    setTimeout(() => { this.booted = true; }, reduce ? 450 : 880);
+    setTimeout(() => { this.booted = true; }, reduce ? 450 : 920);
   }
 
   ngOnDestroy() {

@@ -10,12 +10,14 @@
 /* ================================================================
    MONEIM WORDMARK LOADER
    "Moneim comes alive": the name itself is the spinner.
-     - centered wordmark; continuous liquid wave on each letter
-       (translateY + slight rotate + subtle scale again and again)
-     - letters ripple sequentially M → o → n → e → i → m
+     - centered wordmark that stays perfectly stable; only ONE letter
+       sways at a time, sequentially: M → o → n → e → i → m → repeat
+     - active letter gently tilts / floats / eases back to rest
+       (translateY + slight rotate + subtle scale, pivot at baseline)
+     - each letter has a private 0.25s slot inside a 1.5s seamless loop
+       (staggered delays 0/.25/.5/.75/1/1.25); identity otherwise
      - flowing gradient fill with a slow light shimmer sweep
      - one soft breathing glow behind the name (no ring / no spinner)
-     - seamless loop with smooth cubic-bezier easing; readable always
    transform / opacity / background-position only. ~0.9s total.
    Removed from DOM via Angular @if (booted) once the app is ready.
    ================================================================ */
@@ -24,7 +26,7 @@
   background: linear-gradient(180deg, #ffffff 0%, #fafbff 55%, #f3f5fc 100%);
   display: flex; align-items: center; justify-content: center;
   overflow: hidden;
-  animation: wm-fade .34s ease .56s forwards;
+  animation: wm-fade .38s ease .62s forwards;
 }
 .loading::before {
   content: ''; position: absolute; left: 50%; top: 50%;
@@ -43,18 +45,19 @@
   background-size: 220% 100%;
   -webkit-background-clip: text; background-clip: text;
   -webkit-text-fill-color: transparent; color: transparent;
-  animation: wm-shimmer 3.4s ease-in-out infinite, wm-settle .34s cubic-bezier(.5,0,.6,1) .56s forwards;
+  animation: wm-shimmer 3.4s ease-in-out infinite, wm-settle .38s cubic-bezier(.5,0,.6,1) .62s forwards;
 }
 .wm-letter {
   display: inline-block;
-  animation: wm-wave 1.4s cubic-bezier(.45,0,.55,1) infinite;
+  transform-origin: 50% 80%;
+  animation: wm-sway 1.5s cubic-bezier(.45,0,.55,1) infinite;
   will-change: transform;
 }
-.wm-letter:nth-child(2) { animation-delay: .24s; }
-.wm-letter:nth-child(3) { animation-delay: .48s; }
-.wm-letter:nth-child(4) { animation-delay: .72s; }
-.wm-letter:nth-child(5) { animation-delay: .96s; }
-.wm-letter:nth-child(6) { animation-delay: 1.2s; }
+.wm-letter:nth-child(2) { animation-delay: .25s; }
+.wm-letter:nth-child(3) { animation-delay: .5s; }
+.wm-letter:nth-child(4) { animation-delay: .75s; }
+.wm-letter:nth-child(5) { animation-delay: 1s; }
+.wm-letter:nth-child(6) { animation-delay: 1.25s; }
 .wm-tag {
   text-align: center;
   font-size: .62rem; letter-spacing: .42em; text-indent: .42em;
@@ -64,11 +67,12 @@
   animation: wm-tag-in .45s ease .3s forwards;
 }
 
-@keyframes wm-wave {
-  0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
-  20% { transform: translateY(-10px) rotate(-3deg) scale(1.05); }
-  45% { transform: translateY(-4px) rotate(2deg) scale(1.025); }
-  72% { transform: translateY(4px) rotate(-1deg) scale(.995); }
+@keyframes wm-sway {
+  0%, 15.4% { transform: translateY(0) rotate(0deg) scale(1); }
+  2.2% { transform: translateY(-7px) rotate(-3deg) scale(1.05); }
+  7% { transform: translateY(-1px) rotate(2.2deg) scale(1.03); }
+  12% { transform: translateY(3px) rotate(-0.6deg) scale(.99); }
+  15.4%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
 }
 @keyframes wm-shimmer {
   0%, 100% { background-position: 0% 50%; }
