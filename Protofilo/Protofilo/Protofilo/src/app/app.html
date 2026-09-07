@@ -1,24 +1,11 @@
-<!-- ============ MONEIM SONAR LOADER (CSS, ~1s, removed from DOM via @if booted) ============ -->
+<!-- ============ MONEIM WORDMARK LOADER ("Moneim" is the spinner, ~0.9s, removed via @if booted) ============ -->
 @if (!booted) {
   <div class="loading" aria-hidden="true">
-    <div class="sonar">
-      <div class="sn-scope">
-        <span class="sn-ring r-1"></span>
-        <span class="sn-ring r-2"></span>
-        <span class="sn-ax ax-h"></span>
-        <span class="sn-ax ax-v"></span>
-        <span class="sn-beam"></span>
-        <span class="sn-ping"></span>
-        <span class="sn-ping ping-late"></span>
-        <span class="sn-blip bl-1"></span>
-        <span class="sn-blip bl-2"></span>
-        <div class="sn-core">
-          <div class="sn-word">
-            <span class="ll">M</span><span class="ll">O</span><span class="ll">N</span><span class="ll">E</span><span class="ll">I</span><span class="ll">M</span>
-          </div>
-          <div class="sn-sub mono">PRINCIPAL SOFTWARE ENGINEER</div>
-        </div>
+    <div class="wm-stage">
+      <div class="wordmark">
+        <span class="wm-letter">M</span><span class="wm-letter">o</span><span class="wm-letter">n</span><span class="wm-letter">e</span><span class="wm-letter">i</span><span class="wm-letter">m</span>
       </div>
+      <div class="wm-tag mono">PRINCIPAL SOFTWARE ENGINEER</div>
     </div>
   </div>
 }

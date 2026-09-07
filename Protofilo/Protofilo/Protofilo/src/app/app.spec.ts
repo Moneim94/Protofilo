@@ -22,13 +22,13 @@ describe('App', () => {
     expect(compiled.querySelector('.hero-name')?.textContent).toContain('AHMED');
   });
 
-  it('should show the circular loader until booted, then remove it', () => {
+  it('should show the Moneim wordmark loader until booted, then remove it', () => {
     const fixture = TestBed.createComponent(App);
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelector('.loading')).toBeTruthy();
-    expect(compiled.querySelector('.sn-scope .sn-beam')).toBeTruthy();
-    expect(compiled.querySelector('.sn-word')?.textContent?.replace(/\s/g, '')).toBe('MONEIM');
+    expect(compiled.querySelectorAll('.wm-letter').length).toBe(6);
+    expect(compiled.querySelector('.wordmark')?.textContent?.replace(/\s/g, '')).toBe('Moneim');
     const app = fixture.componentInstance;
     app.booted = true;
     fixture.detectChanges();
