@@ -1,9 +1,11 @@
-<!-- ============ MONEIM WORDMARK LOADER ("Moneim" is the spinner, ~0.9s, removed via @if booted) ============ -->
+<!-- ============ MONEIM WORDMARK LOADER ("Moneim" is the spinner, ~0.9s, removed via @if booted) ============
+     Wave spinner per spinner.html — each letter lags the previous by --i * −0.105s so a crest
+     travels left → right through M·o·n·e·i·m forever; calligraphy "Miracle History" font. -->
 @if (!booted) {
   <div class="loading" aria-hidden="true">
     <div class="wm-stage">
-      <div class="wordmark">
-        <span class="wm-letter">M</span><span class="wm-letter">o</span><span class="wm-letter">n</span><span class="wm-letter">e</span><span class="wm-letter">i</span><span class="wm-letter">m</span>
+      <div class="word">
+        <span class="letter" style="--i:0">M</span><span class="letter" style="--i:1">o</span><span class="letter" style="--i:2">n</span><span class="letter" style="--i:3">e</span><span class="letter" style="--i:4">i</span><span class="letter" style="--i:5">m</span>
       </div>
       <div class="wm-tag mono">PRINCIPAL SOFTWARE ENGINEER</div>
     </div>

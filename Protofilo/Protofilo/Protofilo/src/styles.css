@@ -96,3 +96,13 @@ h1,h2,h3,h4 { font-family: var(--font-display); font-weight: 600; line-height: 1
     scroll-behavior: auto !important;
   }
 }
+
+/* "Miracle History" — elegant calligraphy script, free for personal use
+   (Fikryal Studio). Used for the Moneim wordmark loader. */
+@font-face {
+  font-family: 'Miracle History';
+  src: url('fonts/MiracleHistory.woff') format('woff'),
+       url('fonts/MiracleHistory.ttf') format('truetype');
+  font-style: normal;
+  font-display: swap;
+}

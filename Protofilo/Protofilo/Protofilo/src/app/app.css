@@ -9,17 +9,16 @@
 
 /* ================================================================
    MONEIM WORDMARK LOADER
-   "Moneim comes alive": the name itself is the spinner.
-     - a continuous sine wave travels left → right through the word:
-       letters rise and fall one after another, crest M → o → n → e → i → m
-     - each letter animates a sampled-sine hump (translateY + tilted
-       slope) with phase offset = 0/.2/.4/.6/.8/1.0s; period 1.2s so
-       exactly one full wavelength spans the six letters → the crest
-       visits one letter, then the next, seamlessly and forever
-     - only 1-2 letters sit near the peak; the rest follow smoothly
-     - flowing gradient fill with a slow light shimmer sweep
-     - one soft breathing glow behind the name (no ring / no spinner)
-   transform / opacity / background-position only. ~1s total.
+   "Moneim comes alive": the name itself is the spinner (spinner.html).
+     - the word is set in the elegant calligraphy script "Miracle History"
+     - each letter runs the same 1.05s wave; phase delay = --i * −0.105s,
+       so a crest travels left → right through M → o → n → e → i → m,
+       seamlessly forever (negative delays start the wave mid-flight)
+     - letters rise to −25px with a +4° tilt & 1.08 scale at the crest,
+       relax back down to +18px — a fluid, hand-drawn bounce
+     - cyan → indigo → violet gradient clipped per letter + soft RGB glow
+     - one breathing backdrop glow behind the name (no ring / no spinner)
+   transform / filter only. ~0.9s total.
    Removed from DOM via Angular @if (booted) once the app is ready.
    ================================================================ */
 .loading {
@@ -36,28 +35,27 @@
   filter: blur(30px);
   animation: wm-glow 3.2s ease-in-out 2s infinite;
 }
-.wordmark {
-  display: flex;
-  font-family: var(--font-display); font-weight: 700;
-  font-size: clamp(2.8rem, 8.6vw, 4.4rem);
-  letter-spacing: .04em; line-height: 1.1;
-  padding: .4em .2em .45em;
-  background: linear-gradient(115deg, #1e3a8a 0%, #2563eb 26%, #06b6d4 52%, #7c3aed 78%, #1e3a8a 100%);
-  background-size: 220% 100%;
-  -webkit-background-clip: text; background-clip: text;
-  -webkit-text-fill-color: transparent; color: transparent;
-  animation: wm-shimmer 3.4s ease-in-out infinite, wm-settle .38s cubic-bezier(.5,0,.6,1) .62s forwards;
+.word {
+  display: flex; align-items: center; justify-content: center;
+  gap: 3px;
+  font-family: 'Miracle History', cursive, serif;
+  font-size: clamp(3rem, 11vw, 5.4rem);
+  font-weight: 600;
+  font-style: normal;
+  line-height: 1.15;
+  padding: .3em .25em .38em;
+  animation: wm-settle .38s cubic-bezier(.5,0,.6,1) .62s forwards;
 }
-.wm-letter {
+.letter {
   display: inline-block;
-  animation: wm-sine 1.2s linear infinite;
+  animation: wm-wave 1.05s cubic-bezier(.45,0,.55,1) infinite;
+  animation-delay: calc(var(--i) * -0.105s);
   will-change: transform;
+  background: linear-gradient(135deg, #18d9ff, #5965ff 50%, #c94cff);
+  -webkit-background-clip: text; background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 8px rgba(60,180,255,.35));
 }
-.wm-letter:nth-child(2) { animation-delay: .2s; }
-.wm-letter:nth-child(3) { animation-delay: .4s; }
-.wm-letter:nth-child(4) { animation-delay: .6s; }
-.wm-letter:nth-child(5) { animation-delay: .8s; }
-.wm-letter:nth-child(6) { animation-delay: 1s; }
 .wm-tag {
   text-align: center;
   font-size: .62rem; letter-spacing: .42em; text-indent: .42em;
@@ -67,18 +65,22 @@
   animation: wm-tag-in .45s ease .3s forwards;
 }
 
-@keyframes wm-sine {
-  0% { transform: translateY(0) rotate(0deg); }
-  16.7% { transform: translateY(7px) rotate(3deg); }
-  33.3% { transform: translateY(12px) rotate(1.5deg); }
-  50% { transform: translateY(14px) rotate(0deg); }
-  66.7% { transform: translateY(12px) rotate(-1.5deg); }
-  83.3% { transform: translateY(7px) rotate(-3deg); }
-  100% { transform: translateY(0) rotate(0deg); }
-}
-@keyframes wm-shimmer {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+@keyframes wm-wave {
+  0%, 100% {
+    transform: translateY(18px) rotate(-3deg) scale(.96);
+    filter: drop-shadow(0 0 5px rgba(60,180,255,.25));
+  }
+  25% {
+    transform: translateY(-25px) rotate(4deg) scale(1.08);
+    filter: drop-shadow(0 0 16px rgba(100,100,255,.65));
+  }
+  50% {
+    transform: translateY(0) rotate(0) scale(1);
+    filter: drop-shadow(0 0 8px rgba(60,180,255,.35));
+  }
+  75% {
+    transform: translateY(18px) rotate(-3deg) scale(.96);
+  }
 }
 @keyframes wm-glow {
   0%, 100% { opacity: .5; transform: scale(1); }
@@ -93,15 +95,15 @@
 
 @media (prefers-reduced-motion: reduce) {
   .loading { background: #ffffff; }
-  .wordmark { animation: none !important; background-position: 0 0; }
-  .wm-letter { animation: none !important; }
+  .word { animation: none !important; }
+  .letter { animation: none !important; }
   .wm-tag { animation: none !important; opacity: 1; }
   .loading::before { animation: none !important; opacity: .4; }
   .loading { animation: wm-fade .25s ease .3s forwards; }
 }
 
 @media (max-width: 560px) {
-  .wordmark { font-size: clamp(2.35rem, 10.6vw, 3rem); letter-spacing: .02em; }
+  .word { font-size: clamp(2.6rem, 13vw, 3.4rem); gap: 2px; }
   .wm-tag { font-size: .56rem; letter-spacing: .3em; text-indent: .3em; margin-top: 18px; }
   .loading::before { width: 64vmin; margin: -32vmin 0 0 -32vmin; }
 }

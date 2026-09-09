@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Moneim Wave Spinner</title>
+<style>
+  html,body{
+    margin:0;
+    width:100%;
+    height:100%;
+    background:transparent;
+    overflow:hidden;
+  }
+
+  .spinner{
+    width:100%;
+    height:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+
+  .word{
+    display:flex;
+    align-items:center;
+    gap:3px;
+    font-family:Arial,sans-serif;
+    font-size:clamp(44px,10vw,92px);
+    font-weight:800;
+    line-height:1;
+  }
+
+  .letter{
+    display:inline-block;
+    animation:wave 1.05s cubic-bezier(.45,0,.55,1) infinite;
+    animation-delay:calc(var(--i) * -0.105s);
+    will-change:transform;
+    background:linear-gradient(135deg,#18d9ff,#5965ff 50%,#c94cff);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    filter:drop-shadow(0 0 8px rgba(60,180,255,.35));
+  }
+
+  @keyframes wave{
+    0%,100%{
+      transform:translateY(18px) rotate(-3deg) scale(.96);
+      filter:drop-shadow(0 0 5px rgba(60,180,255,.25));
+    }
+    25%{
+      transform:translateY(-25px) rotate(4deg) scale(1.08);
+      filter:drop-shadow(0 0 16px rgba(100,100,255,.65));
+    }
+    50%{
+      transform:translateY(0) rotate(0) scale(1);
+      filter:drop-shadow(0 0 8px rgba(60,180,255,.35));
+    }
+    75%{
+      transform:translateY(18px) rotate(-3deg) scale(.96);
+    }
+  }
+
+  @media(prefers-reduced-motion:reduce){
+    .letter{animation-duration:1.8s}
+  }
+</style>
+</head>
+<body>
+<div class="spinner" aria-label="Loading">
+  <div class="word">
+    <span class="letter" style="--i:0">M</span>
+    <span class="letter" style="--i:1">o</span>
+    <span class="letter" style="--i:2">n</span>
+    <span class="letter" style="--i:3">e</span>
+    <span class="letter" style="--i:4">i</span>
+    <span class="letter" style="--i:5">m</span>
+  </div>
+</div>
+</body>
+</html>

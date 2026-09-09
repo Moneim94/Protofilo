@@ -27,8 +27,8 @@ describe('App', () => {
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelector('.loading')).toBeTruthy();
-    expect(compiled.querySelectorAll('.wm-letter').length).toBe(6);
-    expect(compiled.querySelector('.wordmark')?.textContent?.replace(/\s/g, '')).toBe('Moneim');
+    expect(compiled.querySelectorAll('.letter').length).toBe(6);
+    expect(compiled.querySelector('.word')?.textContent?.replace(/\s/g, '')).toBe('Moneim');
     const app = fixture.componentInstance;
     app.booted = true;
     fixture.detectChanges();
