@@ -131,8 +131,25 @@
   padding: 0 1.5rem;
   display: flex; align-items: center; justify-content: space-between;
 }
-.nav-brand { font-family: var(--font-display); font-size: 1.15rem; font-weight: 700; letter-spacing: .05em; color: var(--text); cursor: pointer; }
-.nav-brand .brand-dot { color: var(--accent); }
+.nav-brand {
+  font-family: var(--font-display); font-size: 1.15rem; font-weight: 700;
+  letter-spacing: .05em; cursor: pointer;
+  display: inline-block; position: relative;
+  background: linear-gradient(120deg, #1e3a8a, #2563eb 35%, #06b6d4 65%, #7c3aed);
+  background-size: 200% 100%;
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; color: transparent;
+  transition: background-position .55s ease;
+}
+.nav-brand .brand-dot { -webkit-text-fill-color: var(--accent); color: var(--accent); }
+.nav-brand::after {
+  content: ''; position: absolute; left: 0; bottom: -3px; height: 2px; width: 100%;
+  border-radius: 2px; background: var(--accent-grad);
+  transform: scaleX(0); transform-origin: left;
+  transition: transform .35s cubic-bezier(.65,0,.35,1);
+}
+.nav-brand:hover { background-position: 100% 50%; }
+.nav-brand:hover::after { transform: scaleX(1); }
 .nav-links { display: flex; gap: 1.4rem; }
 .nav-link {
   font-size: .8rem; font-weight: 500; color: var(--text-muted);

@@ -16,7 +16,7 @@
   <!-- NAV -->
   <header class="nav" [class.is-scrolled]="scrolled">
     <div class="nav-inner">
-      <a class="nav-brand" (click)="goTo('home')">MONEIM<span class="brand-dot">.</span></a>
+      <a class="nav-brand" (click)="goTo('home')">Moneim<span class="brand-dot">.</span></a>
       <nav class="nav-links">
         @for (item of navItems; track item.id) {
           <a class="nav-link" [class.active]="activeSection === item.id" (click)="goTo(item.id)">{{ item.label }}</a>
